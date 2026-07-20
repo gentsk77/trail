@@ -1,0 +1,6 @@
+# local capture and scratch
+.playwright-mcp/
+shots/
+
+# sandbox copies of live personal data — never committed
+dogfood-data/

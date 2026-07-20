@@ -1,0 +1,585 @@
+/* Component CSS ported verbatim from the approved proposal
+   (design/proposals/2026-07-15-mvp-day-loop-hifi/proposals.html, rounds 2-6)
+   and the sheet. Tokens only; app chrome (full-viewport shell sizing) is the
+   sole adaptation from the mock's boxed demo frames. */
+
+/* ============ skeletons: loading placeholders (dogfood r4.1) ============ */
+/* async content loads behind shape-matched placeholders; the container
+   keeps its loaded size so nothing jumps. Skeletons breathe on
+   --duration-live — loading is genuinely live, the motion law's liveness
+   clause — and settled content never pulses. */
+.skel { background: var(--gray-200); border-radius: var(--radius-xs); animation: skel-breathe var(--duration-live) infinite var(--ease); }
+@keyframes skel-breathe { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+.skel-text { display: inline-block; height: 0.875em; }
+.skel-circle { border-radius: var(--radius-full); }
+
+/* ============ status badges: the one home for task states ============ */
+.badge { display: inline-flex; align-items: center; gap: var(--space-2); font: var(--type-label); font-size: 0.75rem; border-radius: var(--radius-full); padding: 2px var(--space-3) 2px var(--space-2); border: 1px solid transparent; }
+.badge .dot { width: 6px; height: 6px; border-radius: var(--radius-full); flex: none; }
+.badge-planned { background: var(--gray-100); border-color: var(--gray-300); color: var(--gray-900); }
+.badge-planned .dot { background: var(--gray-500); }
+.badge-running { background: var(--gray-100); border-color: var(--gray-300); color: var(--gray-1000); }
+.badge-running .dot { background: var(--gray-800); animation: breathe var(--duration-live) infinite var(--ease); }
+@keyframes breathe { 0%, 100% { opacity: 0.3; transform: scale(0.75); } 50% { opacity: 1; transform: scale(1); } }
+.badge-waiting { background: var(--amber-soft); border-color: transparent; color: var(--amber); }
+.badge-waiting .dot { background: var(--amber); }
+.badge-ready { background: var(--brand-soft); border-color: transparent; color: var(--brand-text); }
+.badge-ready .dot { background: var(--brand-text); }
+.badge-done { background: var(--green-soft); border-color: transparent; color: var(--green); }
+.badge-done .dot { background: var(--green); }
+.badge-shelved { background: transparent; border-color: var(--gray-300); color: var(--gray-800); }
+.badge-shelved .dot { background: transparent; border: 1px solid var(--gray-500); }
+
+/* ============ chips: small metadata carriers ============ */
+.chip { display: inline-flex; align-items: center; gap: var(--space-1); font: var(--type-data); color: var(--gray-800); background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: var(--radius-s); padding: 1px var(--space-2); max-width: 100%; min-width: 0; }
+.chip .icon { width: 11px; height: 11px; color: var(--gray-700); flex: none; }
+/* text in a constrained component: cap, ellipsize, reveal on hover (r1B item 2) */
+.chip .lbl { max-width: 16ch; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip-artifact { cursor: pointer; }
+.chip-artifact:hover { border-color: var(--gray-500); background: var(--gray-200); color: var(--gray-900); }
+
+/* ============ buttons ============ */
+/* inline-flex with the space-2 gap: an icon and its label share one
+   centerline instead of the text baseline (dogfood r2) */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); font: var(--type-label); border-radius: var(--radius-s); padding: 0 var(--space-4); height: 2.25rem; cursor: pointer; border: 1px solid transparent; background: transparent; color: var(--gray-1000); transition: background-color var(--duration-state) var(--ease), border-color var(--duration-state) var(--ease); }
+.btn-primary { background: var(--brand); color: var(--brand-ink); }
+/* the focus law's one exception: a brand border is invisible on the brand fill */
+.btn-primary:focus-visible { outline-color: var(--brand-ink); }
+.btn-primary:hover { background: var(--brand-hover); }
+.btn-secondary { background: var(--background-2); border-color: var(--gray-400); }
+.btn-secondary:hover { border-color: var(--gray-500); background: var(--gray-100); }
+.btn-secondary:active { background: var(--gray-200); }
+.btn-quiet { color: var(--gray-900); }
+.btn-quiet:hover { background: var(--gray-100); }
+.btn:disabled { background: var(--gray-100); border-color: var(--gray-300); color: var(--gray-700); cursor: default; }
+.btn-small { height: 1.875rem; font-size: 0.75rem; padding: 0 var(--space-3); }
+/* icons on primary fills keep --brand-ink, never the muted icon gray (the
+   sheet's icon rule); .btn.btn-primary outranks the picker region's
+   .picker .icon so source order can't flip it back to gray */
+.btn.btn-primary .icon { color: var(--brand-ink); }
+
+/* ============ task card ============ */
+.task-card { width: 17rem; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-raised); padding: var(--space-3) var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); cursor: pointer; transition: border-color var(--duration-state) var(--ease); }
+.task-card:hover { border-color: var(--gray-500); }
+.task-card .title { font: var(--type-body); line-height: 1.4; color: var(--gray-1000); }
+.task-card .meta { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+
+/* ============ backlog tree ============ */
+/* No overflow clip here (dogfood r1B §2): the filter/sort menus anchor
+   inside the tree and must escape it — a clipped tree swallows the open
+   menu once filtering shrinks the list ("Filter goes dead"), and as a
+   grid item under a grid .content the clip lets the whole tree collapse
+   to the viewport ("Backlog not scrollable"). Rounded corners come from
+   radii on the head and last row instead. */
+.tree { border: 1px solid var(--gray-200); border-radius: var(--radius-s); background: var(--background-2); }
+/* breathing room between the checkbox and what follows it (r1B.3 nit) */
+.tree .cbx { margin-right: var(--space-1); }
+.tree > .list-head { border-radius: calc(var(--radius-s) - 1px) calc(var(--radius-s) - 1px) 0 0; }
+.tree > .tree-row:last-child { border-radius: 0 0 calc(var(--radius-s) - 1px) calc(var(--radius-s) - 1px); }
+.tree > .list-head:last-child { border-radius: calc(var(--radius-s) - 1px); } /* filtered-empty tree */
+.tree-row { display: flex; align-items: center; gap: var(--space-2); width: 100%; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--gray-200); background: transparent; border-left: 0; border-right: 0; border-top: 0; text-align: left; font: var(--type-body); color: var(--gray-1000); cursor: pointer; transition: background-color var(--duration-state) var(--ease); }
+.tree > .tree-row:last-child { border-bottom: none; }
+.tree-row:hover { background: var(--gray-100); }
+.tree-row .caret { width: 10px; height: 10px; color: var(--gray-600); transition: transform var(--duration-state) var(--ease); }
+.tree-row.collapsed .caret { transform: rotate(-90deg); }
+.tree-row .count { font: var(--type-caption); color: var(--gray-800); margin-left: auto; }
+.tree-row .when { font: var(--type-caption); color: var(--gray-800); white-space: nowrap; }
+.tree-row.obj-1 .title { font-size: 0.9375rem; }
+.tree-row.task .title { flex: 1; min-width: 8rem; color: var(--gray-1000); }
+/* checkboxes flush left at every depth: hierarchy indents the row content,
+   not the row (ruled 2026-07-15) */
+.tree .tree-row.obj-2, .tree .tree-row.task { padding-left: var(--space-3); }
+.tree .tree-row.obj-2 .caret { margin-left: var(--space-4); }
+/* task-title indent is per-level, set inline by the view (titleIndent) */
+/* click-open is legible - the title is the link */
+.tree-row:hover .title { color: var(--brand-text); }
+
+/* ============ app shell ============ */
+.shell { display: flex; height: 100vh; }
+.sidebar { position: relative; width: 12.5rem; flex: none; border-right: 1px solid var(--gray-200); padding: var(--space-4) var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); transition: width var(--duration-reveal) var(--ease); }
+.sidebar.dragging { transition: none; }
+.wordmark { font: var(--type-brand); color: var(--gray-1000); padding: var(--space-1) var(--space-3) var(--space-4); }
+/* header row: wordmark left, fold toggle right; collapsed keeps the
+   toggle alone, centered on the rail */
+.side-head { display: flex; align-items: flex-start; }
+.side-head .wordmark { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; }
+.nav-toggle { flex: none; margin-top: var(--space-1); color: var(--gray-700); }
+.nav-toggle:hover { color: var(--gray-900); }
+.sidebar.collapsed .side-head { justify-content: center; }
+.sidebar.collapsed .nav-toggle { margin-top: 0; }
+/* the icon rail (ui r1): icons centered, labels move to hover tips */
+.sidebar.collapsed { width: 3.75rem; }
+.sidebar.collapsed .nav-item { justify-content: center; position: relative; }
+.sidebar.collapsed .nav-dot { position: absolute; top: var(--space-1); right: var(--space-1); margin: 0; }
+.sidebar.collapsed .demo-banner { justify-content: center; }
+/* hover tips, rail only: micro-popovers on the menu chrome; a beat of
+   delay in, gone at once on leave */
+.sidebar.collapsed [data-tip]::after {
+  content: attr(data-tip); position: absolute; left: calc(100% + var(--space-2)); top: 50%; transform: translateY(-50%);
+  z-index: 30; white-space: nowrap; font: var(--type-caption); color: var(--gray-1000);
+  background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-s);
+  padding: var(--space-1) var(--space-2); box-shadow: var(--shadow-float);
+  opacity: 0; pointer-events: none; transition: opacity var(--duration-state) var(--ease);
+}
+.sidebar.collapsed [data-tip]:hover::after { opacity: 1; transition-delay: 200ms; }
+.sidebar.collapsed .demo-banner[data-tip], .sidebar.collapsed .nav-toggle[data-tip] { position: relative; }
+/* the resize handle: a 6px grab strip straddling the border; the
+   hairline lights on hover and while dragging; double-click resets */
+.sidebar-rsz { position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; z-index: 20; touch-action: none; }
+.sidebar-rsz::after { content: ""; position: absolute; top: 0; bottom: 0; left: 2px; width: 2px; background: transparent; transition: background-color var(--duration-state) var(--ease); }
+.sidebar-rsz:hover::after, .sidebar.dragging .sidebar-rsz::after { background: var(--gray-500); }
+.nav-item { display: flex; align-items: center; gap: var(--space-2); width: 100%; text-align: left; font: var(--type-body); color: var(--gray-900); background: transparent; border: 0; border-radius: var(--radius-s); padding: var(--space-2) var(--space-3); cursor: pointer; transition: background-color var(--duration-state) var(--ease); }
+.nav-item .icon { color: var(--gray-700); }
+.nav-item:hover { background: var(--gray-100); }
+.nav-item.active { background: var(--brand-soft); color: var(--brand-text); }
+/* the selected destination holds the filled glyph (Material's selected
+   grammar), same brand hue as its label; hover stays outline */
+.nav-item.active .icon { color: var(--brand-text); --icon-o: none; --icon-f: inline; }
+/* nav presence dot (D17 r1): something awaits judgment; still, never
+   breathing (motion = liveness only); no number for now */
+.nav-dot { margin-left: auto; width: 6px; height: 6px; border-radius: var(--radius-full); background: var(--brand); flex: none; }
+.sidebar-foot { margin-top: auto; border-top: 1px solid var(--gray-200); padding-top: var(--space-2); }
+
+/* ============ demo declarations (story 12) ============ */
+/* the persistent mark: a banner card above the footer separator on
+   every view, demo mode only (the update-notification grammar, r6).
+   The amber tint is amber's ruled second meaning (maintainer,
+   2026-07-16): the demo-notice accent, alongside Waiting. */
+.demo-banner { margin-top: auto; display: flex; align-items: center; gap: var(--space-2); width: 100%; text-align: left; font: var(--type-body); font-weight: 500; color: var(--gray-1000); background: var(--amber-soft); border: 0; border-radius: var(--radius-m); padding: var(--space-3); margin-bottom: var(--space-3); cursor: pointer; }
+.demo-banner:hover { box-shadow: inset 0 0 0 1px var(--amber); }
+.demo-banner .icon { width: 20px; height: 20px; color: var(--amber); flex: none; }
+.demo-banner .title { flex: 1; min-width: 0; } /* wraps if it must; the label stays short (r7) */
+.demo-banner .go { width: 12px; height: 12px; color: var(--gray-800); align-self: center; }
+/* the banner owns the bottom push; the footer stops double-claiming it */
+.demo-banner + .sidebar-foot { margin-top: 0; }
+/* the mini-dialog: a title, one paragraph, footer actions — the demo
+   banner's note and the delete confirm share this one chrome (ui r2)
+   (.menu.note: the menu chrome declares its own padding later in this
+   file — the compound selector keeps the dialog padding winning) */
+.menu.note { max-width: 21rem; padding: var(--space-4); }
+.note h4 { margin: 0 0 var(--space-2); font: var(--type-body); font-weight: 500; color: var(--gray-1000); }
+.note p { margin: 0; font: var(--type-body); color: var(--gray-900); }
+.note .foot { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-3); }
+/* the notice toast: bottom-center, one at a time; shares the popover
+   layer (z 50) — no new z literal while the scale question stays open.
+   Soft-inverse surface (r8): gray-900 + background-2 flip to mid-slate
+   on white / light-gray on charcoal — visible without hitting either
+   pole. The demo-notice amber stays the banner's; the toast carries
+   contrast, not hue. */
+.demo-toast { position: fixed; bottom: var(--space-6); left: 50%; transform: translateX(-50%); z-index: 50; max-width: min(28rem, calc(100vw - 2rem)); display: flex; align-items: flex-start; gap: var(--space-2); background: var(--gray-900); border: 0; border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-2) var(--space-4); font: var(--type-body); color: var(--background-2); }
+.demo-toast .icon { width: 14px; height: 14px; flex: none; margin-top: 3px; }
+/* views render into one centered column capped at the sheet's wide demo
+   frame (78rem); on ultrawide viewports the surplus becomes symmetric
+   gutters instead of stretching the board */
+.content { flex: 1; min-width: 0; padding: var(--space-6) var(--space-8); overflow: auto; display: grid; grid-template-columns: minmax(0, 78rem); justify-content: center; align-content: start; }
+/* board views fill the viewport: the head takes its row, the board the
+   rest — the whole column below a header is a drop target (dogfood r5) */
+.content-fill { grid-template-rows: auto 1fr; align-content: stretch; }
+.view-head { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-6); }
+.view-head h3 { font: var(--type-title); letter-spacing: -0.01em; margin: 0; }
+.view-head .side { margin-left: auto; display: flex; align-items: center; gap: var(--space-2); }
+
+/* ============ calendar control cluster ============ */
+.seg { display: inline-flex; align-items: center; background: var(--gray-200); border-radius: var(--radius-full); padding: 2px; }
+.seg .btn-small { color: var(--gray-900); height: 1.625rem; border-radius: var(--radius-full); }
+.seg .btn-small:hover { background: transparent; color: var(--gray-1000); }
+.seg .btn-small.active { background: var(--background-2); color: var(--gray-1000); }
+.jump { width: 5rem; padding: 0; text-align: center; }
+.btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.875rem; height: 1.875rem; padding: 0; }
+.picker { display: inline-flex; align-items: center; gap: var(--space-2); }
+.picker .icon { color: var(--gray-700); }
+.picker.fixed { width: 9.75rem; }
+.picker.fixed .lbl { flex: 1; text-align: center; }
+
+/* 15rem: fits "September 2026" + nav with room, ~28px day cells; 17rem
+   read as dead space in week mode (dogfood r1B item 11) */
+.cal { width: 15rem; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-4); }
+.cal-head { display: flex; align-items: center; margin-bottom: var(--space-2); }
+.cal-head .month { font: var(--type-label); color: var(--gray-1000); }
+.cal-head .nav { margin-left: auto; display: flex; gap: var(--space-1); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-grid .dow { font: var(--type-caption); color: var(--gray-700); text-align: center; padding: var(--space-1) 0; }
+.cal-grid .day { font: var(--type-caption); color: var(--gray-1000); text-align: center; padding: var(--space-1) 0; border-radius: var(--radius-s); cursor: pointer; border: 1px solid transparent; background: transparent; }
+.cal-grid .day:hover { background: var(--gray-100); }
+.cal-grid .day.muted { color: var(--gray-600); }
+.cal-grid .day.today { border-color: var(--gray-500); }
+.cal-grid .day.selected { background: var(--brand); color: var(--brand-ink); }
+.cal-grid .day.in-week { background: var(--brand-soft); color: var(--brand-text); border-radius: 0; }
+.cal-grid .day.in-week.first { border-radius: var(--radius-s) 0 0 var(--radius-s); }
+.cal-grid .day.in-week.last { border-radius: 0 var(--radius-s) var(--radius-s) 0; }
+.cal-grid .day.in-week.selected { background: var(--brand); color: var(--brand-ink); border-radius: var(--radius-s); }
+.cal-foot { border-top: 1px solid var(--gray-200); margin-top: var(--space-2); padding-top: var(--space-2); font: var(--type-caption); color: var(--gray-800); text-align: center; }
+
+/* ============ board ============ */
+/* columns stretch to equal height so every col-body is droppable to the
+   board's bottom, not just to its own content edge (dogfood r1B item 10) */
+.board { display: flex; gap: var(--space-4); align-items: stretch; }
+/* columns cap at 14rem: cards stay card-shaped on wide viewports instead
+   of stretching into slabs (r1B item 1; the cap is the one tuning knob) */
+.col { flex: 1; min-width: 0; max-width: 14rem; display: flex; flex-direction: column; gap: var(--space-2); }
+/* every head reserves the action slot's height, whether or not it carries
+   one: the label box alone is 18px, so only Planned's add button (1.5rem)
+   grew its head and dropped its label and cards below the other columns */
+.col-head { display: flex; align-items: center; gap: var(--space-2); height: calc(1.5rem + var(--space-1)); font: var(--type-label); color: var(--gray-900); padding: 0 var(--space-1) var(--space-1); }
+.col-head .count { font: var(--type-data); color: var(--gray-700); }
+.col-dot { width: 6px; height: 6px; border-radius: var(--radius-full); flex: none; }
+.col-dot.planned { background: var(--gray-500); }
+.col-dot.running { background: var(--gray-800); animation: breathe var(--duration-live) infinite var(--ease); }
+.col-dot.waiting { background: var(--amber); }
+.col-dot.ready { background: var(--brand-text); }
+.col-dot.done { background: var(--green); }
+.col-head .btn-icon { margin-left: auto; height: 1.5rem; width: 1.5rem; color: var(--gray-800); }
+.col-head .btn-icon:hover { background: var(--gray-100); color: var(--gray-1000); }
+.col-body { flex: 1; display: flex; flex-direction: column; gap: var(--space-2); min-height: 22rem; border-radius: var(--radius-m); }
+/* drop state must not reflow cards: outline + tint take no layout space
+   (the old border + padding shrank every card on drag-over) */
+.col-body.drop { background: var(--gray-100); outline: 1px dashed var(--gray-500); outline-offset: -1px; }
+
+/* standardized card: fixed height, 3-line clamp title, project pill at the bottom */
+.col .task-card { width: auto; height: 7.25rem; }
+.col .task-card .title { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.col .task-card .meta { margin-top: auto; flex-wrap: nowrap; }
+.task-card.dragging { box-shadow: var(--shadow-float); border-color: var(--gray-500); cursor: grabbing; }
+
+/* quick add (board) */
+.quick-add { display: flex; align-items: center; gap: var(--space-2); background: var(--background-2); border: 1px solid var(--gray-400); border-radius: var(--radius-m); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3); }
+.quick-add input { flex: 1; min-width: 0; border: 0; background: transparent; font: var(--type-body); color: var(--gray-1000); outline: none; }
+.quick-add input::placeholder { color: var(--gray-700); }
+.quick-add:focus-within { outline: 1px solid var(--brand); outline-offset: -1px; }
+.quick-add .btn-icon { height: 1.5rem; width: 1.5rem; border-radius: var(--radius-s); }
+
+/* ============ menus (float panels) ============ */
+.menu { width: max-content; min-width: 11rem; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-1); }
+.menu-item { display: flex; align-items: center; gap: var(--space-2); width: 100%; text-align: left; font: var(--type-body); color: var(--gray-1000); background: transparent; border: 0; border-radius: var(--radius-s); padding: var(--space-2) var(--space-3); cursor: pointer; }
+.menu-item:hover { background: var(--gray-100); }
+.menu-item .icon { color: var(--gray-700); }
+.menu-item .hint { font: var(--type-caption); color: var(--gray-800); margin-left: auto; }
+.menu-item:disabled { color: var(--gray-700); cursor: default; }
+.menu-item:disabled:hover { background: transparent; }
+/* None sits apart from the real options (r1B.3 nit) */
+.menu-item.sep-above { border-top: 1px solid var(--gray-200); margin-top: var(--space-1); border-top-left-radius: 0; border-top-right-radius: 0; }
+.menu-label { font: var(--type-caption); color: var(--gray-800); padding: var(--space-2) var(--space-3) var(--space-1); }
+/* the popover primitive's panel (Popover.tsx owns placement): fixed +
+   portaled so opening one never reflows or scrolls an ancestor; sits
+   above the modal layer (dm-wrap z 40); overlong content scrolls inside */
+.popover { position: fixed; z-index: 50; display: flex; flex-direction: column; }
+.popover > * { min-height: 0; overflow-y: auto; }
+
+/* ============ selection checkbox ============ */
+.cbx { width: 1rem; height: 1rem; flex: none; border: 1px solid var(--gray-700); border-radius: var(--radius-full); background: var(--background-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+.cbx:hover { border-color: var(--gray-800); }
+.cbx.checked { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.cbx .icon { width: 10px; height: 10px; }
+.cbx.checked .icon { color: var(--brand-ink); }
+
+/* ============ list header (GitHub-style) ============ */
+.list-head { display: flex; align-items: center; gap: var(--space-4); background: var(--gray-100); border-bottom: 1px solid var(--gray-200); padding: var(--space-2) var(--space-3); }
+.list-head .counts { display: flex; gap: var(--space-3); font: var(--type-label); }
+.list-head .counts .on { color: var(--gray-1000); }
+.list-head .counts .off { color: var(--gray-800); font-weight: 400; }
+.list-head .side { margin-left: auto; display: flex; gap: var(--space-1); }
+.list-head .counts button { border: 0; background: transparent; padding: 0; cursor: pointer; font: inherit; color: inherit; }
+
+/* ============ backlog header controls + search (r1B.2) ============ */
+/* project filter options: leaf name on the ruled pill treatment (16ch cap
+   + ellipsis, full path on the native tooltip) */
+.menu-item .proj-lbl { max-width: 16ch; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* search above the header row: same box grammar as the board quick-add */
+.list-search { display: flex; align-items: center; gap: var(--space-2); background: var(--background-2); border: 1px solid var(--gray-400); border-radius: var(--radius-s); height: 2rem; padding: 0 var(--space-3); margin-bottom: var(--space-3); }
+.list-search .icon { color: var(--gray-700); }
+.list-search input { flex: 1; min-width: 0; border: 0; background: transparent; font: var(--type-body); color: var(--gray-1000); outline: none; }
+.list-search input::placeholder { color: var(--gray-700); }
+.list-search:focus-within { outline: 1px solid var(--brand); outline-offset: -1px; }
+
+/* ============ backlog bulk header (r1B.3) ============ */
+/* select-all mixed state, everywhere a select-all lives (dogfood r3,
+   generalized from the list header): same brand fill as checked, a drawn
+   dash instead of a glyph (one-off state, no new icon); row checkboxes
+   never mix */
+.cbx.mixed { background: var(--brand); border-color: var(--brand); }
+.cbx .dash { width: 8px; height: 2px; border-radius: 1px; background: var(--brand-ink); flex: none; }
+/* the standalone select-all control: its checkbox + the flipping label */
+.sel-all { display: inline-flex; align-items: center; gap: var(--space-2); background: transparent; border: 0; border-radius: var(--radius-s); padding: var(--space-1) var(--space-2); font: var(--type-label); color: var(--gray-900); cursor: pointer; transition: background-color var(--duration-state) var(--ease); }
+.sel-all:hover { background: var(--gray-100); }
+/* bulk objective menu: L2s indent one level beneath their L1; titles get
+   the ruled truncation treatment at a 28ch cap (titles are sentences, the
+   16ch pill cap would amputate them), full title on the native tooltip */
+.menu-item.sub { padding-left: calc(var(--space-3) + var(--space-4)); }
+.menu-item .obj-lbl { max-width: 28ch; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ============ lists (progress and projects views) ============ */
+.recap-group { margin-bottom: var(--space-4); }
+.recap-group .group-head { display: flex; align-items: baseline; gap: var(--space-2); font: var(--type-label); color: var(--gray-900); margin-bottom: var(--space-2); }
+.recap-group .group-head .count { font: var(--type-data); color: var(--gray-700); }
+/* Same no-clip rule as the backlog tree (r1B §2): a clipped grid item
+   collapses under the grid .content and swallows anchored menus. */
+.list { border: 1px solid var(--gray-200); border-radius: var(--radius-s); background: var(--background-2); }
+.list > :first-child { border-radius: calc(var(--radius-s) - 1px) calc(var(--radius-s) - 1px) 0 0; }
+.list > :last-child { border-radius: 0 0 calc(var(--radius-s) - 1px) calc(var(--radius-s) - 1px); }
+.list > :only-child { border-radius: calc(var(--radius-s) - 1px); }
+.list-row { display: flex; align-items: center; gap: var(--space-2); width: 100%; padding: var(--space-2) var(--space-3); border: 0; border-bottom: 1px solid var(--gray-200); background: transparent; text-align: left; font: var(--type-body); color: var(--gray-1000); cursor: pointer; transition: background-color var(--duration-state) var(--ease); }
+.list > .list-row:last-child { border-bottom: none; }
+.list-row:hover { background: var(--gray-100); }
+/* a disabled row states itself quietly (scan-only apps, dogfood r2) */
+.list-row:disabled { cursor: default; }
+.list-row:disabled:hover { background: transparent; }
+/* disabled rows mute by color, not opacity (dogfood r4): text drops to the
+   muted-foreground gray and stays legible; the vendor mark keeps its
+   identity colors — the state chip carries the why */
+.list-row:disabled .title { color: var(--gray-700); }
+.list-row:disabled .cbx { opacity: 0.5; }
+.list-row .title { flex: 1; min-width: 10rem; }
+/* agent-app rows (connect step 1): the name hugs its state chip; the
+   count column alone owns the right edge, so every row is one line tall */
+.app-row .title { flex: none; min-width: 0; }
+.list-row .end { font: var(--type-caption); color: var(--gray-800); white-space: nowrap; margin-left: auto; }
+.list-row .end.data { font: var(--type-data); color: var(--gray-700); }
+
+/* ============ inbox: the attention queue (D17) ============ */
+/* section head: status dot (board col-dot grammar) + label + mono count
+   + the one primary, right-aligned, disabled at zero selection (r3) */
+.ib-sec { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-6) 0 var(--space-3); }
+/* the head's own margin carries the gap (dogfood r4.1 — :first-of-type
+   counted divs, matched the view head, and never fired) */
+.view-head + .ib-sec { margin-top: 0; }
+.ib-sec .lbl { font: var(--type-label); color: var(--gray-1000); }
+.ib-sec .n { font: var(--type-data); color: var(--gray-700); }
+.ib-sec .side { margin-left: auto; display: flex; align-items: center; gap: var(--space-2); }
+/* card collapses to its header row (r2); artifact count shows collapsed
+   only — expanded, the tiles say it themselves (r6) */
+.ib-card { background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-raised); padding: var(--space-4) var(--space-6); display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-3); }
+.ib-card.closed .thumb-strip { display: none; }
+.ib-card.closed .ib-excerpt { display: none; }
+.ib-card:not(.closed) .arts { display: none; }
+/* whole header = the disclosure target (r4/r5, ARIA disclosure pattern);
+   interactive children except themselves */
+.ib-head { display: flex; align-items: center; gap: var(--space-2); min-width: 0; cursor: pointer; }
+.ib-head .cbx:not(.checked) .icon { visibility: hidden; }
+.ib-head .title { font: var(--type-body); color: var(--gray-1000); text-align: left; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ib-head .arts { font: var(--type-data); color: var(--gray-700); white-space: nowrap; }
+.ib-open { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-1); background: transparent; border: 0; padding: 0; font: var(--type-caption); color: var(--gray-800); cursor: pointer; white-space: nowrap; transition: color var(--duration-state) var(--ease); }
+.ib-open .icon { width: 11px; height: 11px; }
+.ib-open:hover { color: var(--brand-text); }
+/* leading caret on the tree-row recipe (r3): plain, no button chrome */
+.ib-caret { display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; padding: var(--space-1); cursor: pointer; color: var(--gray-600); transition: color var(--duration-state) var(--ease); }
+/* hovering anywhere on the disclosure target lights the caret; the
+   checkbox and Open session carry their own actions, so they don't */
+.ib-head:hover:not(:has(.cbx:hover, .ib-open:hover)) .ib-caret { color: var(--brand-text); }
+.ib-caret .icon { width: 12px; height: 12px; transition: transform var(--duration-state) var(--ease); }
+.ib-card.closed .ib-caret .icon { transform: rotate(-90deg); }
+/* the agent's last message: three-line clamp, plain body type — agent-
+   authored content, not app copy (r2–r3) */
+.ib-excerpt { font: var(--type-body); color: var(--gray-900); margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* the excerpt renders inline markdown instead of its syntax (dogfood r2):
+   bold at label weight (headings-never-bold law untouched), code on the
+   data face — block markers strip to text in a three-line clamp */
+.ib-excerpt strong { font-weight: 500; }
+.ib-excerpt code { font: var(--type-data); background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: var(--radius-xs); padding: 0 3px; }
+
+/* ============ artifact thumbnails (D17, amends D8 for this surface) ============ */
+/* preview tiles for previewable files, icon tiles for refs; hover =
+   brand border (a link affordance, r5) + the open-link glyph revealed
+   before the name, space reserved so nothing reflows (r6) */
+.thumb-strip { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.thumb { width: 9rem; padding: 0; border: 1px solid var(--gray-300); border-radius: var(--radius-s); background: var(--background-2); overflow: hidden; cursor: pointer; text-align: left; display: flex; flex-direction: column; transition: border-color var(--duration-state) var(--ease); }
+.thumb:hover { border-color: var(--brand); }
+.thumb .prev { height: 5.25rem; background: var(--gray-100); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+.thumb .prev .icon { width: 20px; height: 20px; color: var(--gray-600); }
+/* real renders (D17): image covers the frame; html is an inert
+   sandboxed page scaled to fit; text shows its opening lines */
+.thumb .prev img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb .prev iframe { position: absolute; top: 0; left: 0; width: 400%; height: 400%; transform: scale(0.25); transform-origin: 0 0; border: 0; background: #fff; pointer-events: none; }
+.thumb .prev .txt { align-self: stretch; flex: 1; padding: var(--space-2) var(--space-3); font: var(--type-data); font-size: 0.5rem; line-height: 1.6; color: var(--gray-800); white-space: pre-wrap; overflow: hidden; text-align: left; }
+.thumb .foot { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); font: var(--type-data); color: var(--gray-900); min-width: 0; }
+.thumb .foot .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.thumb .foot .go { visibility: hidden; width: 11px; height: 11px; color: var(--brand-text); flex: none; }
+.thumb:hover .foot .go { visibility: visible; }
+
+/* ============ projects view: the management surface (D18) ============ */
+/* auto-fill keeps cards narrow (r2, ~3 across); count bottom-anchors so
+   cards align whether or not a path line exists (folderless = no path) */
+.proj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: var(--space-4); }
+.proj-card { position: relative; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-raised); padding: var(--space-4) var(--space-6); display: flex; flex-direction: column; gap: var(--space-2); min-height: 6.5rem; cursor: pointer; text-align: left; transition: border-color var(--duration-state) var(--ease); }
+.proj-card:hover { border-color: var(--gray-500); }
+.proj-card .name { font: var(--type-section); color: var(--gray-1000); padding-right: var(--space-6); }
+/* the card overflow menu (ui r2): its own target inside the card, the
+   col-head icon-button treatment */
+.proj-kebab { position: absolute; top: var(--space-3); right: var(--space-3); display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; border-radius: var(--radius-s); color: var(--gray-800); transition: background-color var(--duration-state) var(--ease); }
+.proj-kebab:hover { background: var(--gray-100); color: var(--gray-1000); }
+.proj-card .path { font: var(--type-data); color: var(--gray-800); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.proj-card .count { margin-top: auto; font: var(--type-caption); color: var(--gray-800); }
+.empty-state { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding: var(--space-8); border: 1px solid var(--gray-200); border-radius: var(--radius-m); background: var(--background-2); }
+.empty-state .lede { font: var(--type-section); color: var(--gray-1000); }
+.empty-state .why { font: var(--type-body); color: var(--gray-900); margin-bottom: var(--space-2); }
+/* the Inbox's clear-queue hero (D26): the one celebratory empty state —
+   fills the view (content-fill row), big glyph centered over the line */
+.empty-hero { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-4); }
+.empty-hero .icon { width: 48px; height: 48px; color: var(--gray-600); }
+.empty-hero .lede { font: var(--type-title); letter-spacing: -0.01em; color: var(--gray-800); }
+
+/* ============ project modal (D18) ============ */
+/* Choose folder stacks under the directory input (r1); it opens the OS
+   folder dialog via the sidecar (dogfood r2), live-local only */
+.dir-row { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+.dir-row .input { width: 100%; }
+
+/* ============ suggested sessions (task modal side rail, D18) ============ */
+.suggest-row { display: flex; flex-direction: column; gap: var(--space-1); padding-bottom: var(--space-2); }
+.suggest-row .what { font: var(--type-body); color: var(--gray-1000); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.suggest-row .meta { font: var(--type-data); color: var(--gray-700); }
+.suggest-row .acts { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
+
+/* ============ activity grid (Progress) ============ */
+.heat { display: inline-flex; flex-direction: column; gap: var(--space-1); }
+.heat-months { display: grid; grid-template-columns: repeat(26, 11px); gap: 3px; margin-left: calc(2rem + var(--space-2)); font: var(--type-data); color: var(--gray-700); }
+.heat-months span { grid-row: 1; white-space: nowrap; }
+.heat-body { display: flex; gap: var(--space-2); }
+.heat-days { width: 2rem; display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; font: var(--type-data); color: var(--gray-700); }
+.heat-days span { line-height: 11px; }
+.heat-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 11px); grid-auto-columns: 11px; gap: 3px; }
+.heat-cell { width: 11px; height: 11px; padding: 0; border: 1px solid transparent; border-radius: var(--radius-xs); background: var(--gray-200); cursor: pointer; display: block; }
+.heat-cell.h1 { background: var(--heat-1); }
+.heat-cell.h2 { background: var(--heat-2); }
+.heat-cell.h3 { background: var(--heat-3); }
+.heat-cell.h4 { background: var(--heat-4); }
+.heat-cell:hover { border-color: var(--gray-600); }
+.heat-cell.selected { outline: 1px solid var(--brand); outline-offset: -1px; }
+.heat-cell.future { visibility: hidden; }
+.heat-foot { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-1); font: var(--type-caption); color: var(--gray-800); margin-top: var(--space-1); }
+.heat-foot .heat-cell { cursor: default; }
+.heat-foot span:first-child, .heat-foot span:last-child { margin: 0 var(--space-1); }
+
+/* selected-day heading */
+.day-head { display: flex; align-items: baseline; gap: var(--space-2); margin: var(--space-6) 0 var(--space-3); }
+.day-head .lbl { font: var(--type-label); color: var(--gray-1000); }
+.day-head .count { font: var(--type-data); color: var(--gray-700); }
+
+/* ============ task detail modal: GitHub-issues split ============ */
+/* the panel is a flex column capped to the viewport: head and foot pin,
+   and the panel itself never scrolls (r1B.2 §1). Simple modals give one
+   .dm-scroll region between them; the task modal's body is fixed —
+   description and side-rail fields stay put while the Activity timeline
+   (and, independently, an overlong side rail) scrolls inside it
+   (r1B.3 §3) */
+.dm { position: relative; width: 56rem; max-width: 100%; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-float); display: flex; flex-direction: column; }
+/* the wrapper dims the page behind the panel (--scrim; dogfood r3,
+   superseding the no-scrim ruling) and stays the click-catcher — outside
+   click closes. Placement is dead center, both axes (dogfood r2); the
+   panel caps at the padded viewport and keeps its float shadow. */
+.dm-wrap { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; padding: var(--space-10) var(--space-6); background: var(--scrim); }
+/* title-row action (dogfood r3): Dispatch rides the header grammar,
+   pinned to the row's end */
+.dm-title .dm-act-btn { margin-left: auto; flex: none; }
+.dm-wrap .dm { max-height: 100%; }
+.dm-head, .dm-foot { flex: none; }
+.dm-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+/* the head reserves the close control's lane so nothing runs under it */
+.dm-head { padding: var(--space-6) calc(var(--space-6) + 2rem) var(--space-4) var(--space-6); display: flex; flex-direction: column; gap: var(--space-2); }
+.crumbs { display: flex; align-items: center; gap: var(--space-2); font: var(--type-caption); color: var(--gray-800); }
+.crumbs a { color: var(--gray-800); }
+.crumbs .btn-icon { margin-left: auto; height: 1.5rem; width: 1.5rem; color: var(--gray-800); }
+.dm-title { font: var(--type-section); margin: 0; display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+/* header grammar (r1B.2 item 4): the title row carries the main action and
+   the close control; details go in one caption line under it */
+.dm-sub { font: var(--type-caption); color: var(--gray-800); }
+.dm-title .btn-icon { flex: none; height: 1.5rem; width: 1.5rem; color: var(--gray-700); }
+/* close pins to the panel's top-right corner (dogfood r3.1), out of the
+   title row's flow */
+.dm-title .dm-close { position: absolute; top: var(--space-4); right: var(--space-4); }
+/* title node: truncates with ellipsis (full text via title attr); as a button
+   it carries the hover-and-click edit affordance */
+/* the title is a full-width edit target (dogfood r4): the button and the
+   input share one box — flex 1, breathing padding so the text selection
+   never presses the box edge — and swapping them cannot shift layout */
+.dm-title .title-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: inherit; color: inherit; text-align: left; background: transparent; border: 0; border-radius: var(--radius-s); padding: var(--space-1) var(--space-2); margin: 0 calc(-1 * var(--space-2)); }
+button.title-text { cursor: text; transition: background-color var(--duration-state) var(--ease); }
+button.title-text:hover { background: var(--gray-100); }
+/* inline title input: same box as the title node — no layout jump */
+.dm-title .title-edit { flex: 1; min-width: 0; font: inherit; color: inherit; background: transparent; border: 0; border-radius: var(--radius-s); padding: var(--space-1) var(--space-2); margin: 0 calc(-1 * var(--space-2)); }
+.title-edit::placeholder { color: var(--gray-700); }
+.dm-body { display: flex; align-items: stretch; flex: 1 1 auto; min-height: 0; }
+/* fixed body (view mode): the guard clips runaway content at the footer
+   line instead of bleeding over it; scrolling happens only in .tl-scroll
+   and .dm-side */
+.dm-body-fixed { overflow: hidden; }
+.dm-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-2) var(--space-6) var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); }
+.dm-side { width: 15rem; flex: none; border-left: 1px solid var(--gray-200); padding: var(--space-2) var(--space-6) var(--space-6) var(--space-4); display: flex; flex-direction: column; gap: var(--space-4); min-height: 0; overflow-y: auto; overflow-x: hidden; }
+/* section heads carry no controls: click-to-edit on the text is the whole
+   affordance (r1B.3 §4, pencils removed) */
+.sec-head { display: flex; align-items: center; gap: var(--space-2); }
+.sec-head .lbl { font: var(--type-label); color: var(--gray-900); }
+.dm .desc { margin: var(--space-1) 0 0; color: var(--gray-900); }
+/* description edits in place: the display node is a quiet button, the
+   textarea shares its box (auto-height) — swap without a layout jump */
+.dm button.desc, .dm .desc-edit { display: block; width: calc(100% + 2 * var(--space-2)); text-align: left; font: var(--type-body); color: var(--gray-900); background: transparent; border: 0; border-radius: var(--radius-s); padding: var(--space-1) var(--space-2); margin: 0 calc(-1 * var(--space-2)); white-space: pre-line; }
+.dm button.desc { cursor: text; transition: background-color var(--duration-state) var(--ease); }
+.dm button.desc:hover { background: var(--gray-100); }
+/* the description edits in a real multi-line box (dogfood r4): room for
+   several lines by default, and the operator can pull it taller — the
+   native resize handle, vertical only, floored at the min height */
+.dm .desc-edit { min-height: 6rem; resize: vertical; overflow: auto; }
+.field { display: flex; flex-direction: column; gap: var(--space-1); }
+.field > .lbl { font: var(--type-caption); color: var(--gray-800); }
+.field-btn { display: flex; align-items: center; gap: var(--space-2); border: 0; background: transparent; border-radius: var(--radius-s); padding: var(--space-1) var(--space-2); margin: 0 calc(-1 * var(--space-2)); font: var(--type-body); color: var(--gray-1000); cursor: pointer; text-align: left; transition: background-color var(--duration-state) var(--ease); }
+.field-btn:hover { background: var(--gray-100); }
+.field-btn .caret { margin-left: auto; width: 10px; height: 10px; color: var(--gray-600); }
+/* objective titles run long: truncate in the rail, full text via title attr */
+.field-btn .obj-lbl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* artifacts are links and read as links (r1B.2): brand-text label,
+   underline + wash on hover, the open-out glyph always visible */
+.art-row { display: flex; align-items: center; gap: var(--space-2); border: 0; background: transparent; border-radius: var(--radius-s); padding: var(--space-1) var(--space-2); margin: 0 calc(-1 * var(--space-2)); font: var(--type-data); color: var(--brand-text); cursor: pointer; text-align: left; transition: background-color var(--duration-state) var(--ease); }
+.art-row:hover { background: var(--gray-100); text-decoration: underline; }
+/* session links reflow inside the fixed rail (dogfood r4): break anywhere
+   (ids and paths have no spaces), clamp at two lines, no horizontal scroll */
+.art-row .wrap2 { flex: 1; min-width: 0; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+.art-row .icon { color: var(--gray-700); }
+.art-row .go { margin-left: auto; width: 11px; height: 11px; color: var(--gray-600); }
+.art-row:hover .go { color: var(--brand-text); }
+/* the Activity section owns the main column's scroll (r1B.3 §3): its head
+   pins under the description, the timeline scrolls in .tl-scroll — the
+   wrapper scrolls (not .tl itself) so the rail line spans every row */
+.dm-act { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: var(--space-2); border-top: 1px solid var(--gray-200); padding-top: var(--space-4); }
+.tl-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.tl { position: relative; display: flex; flex-direction: column; gap: var(--space-2); }
+.tl::before { content: ""; position: absolute; left: 10px; top: 10px; bottom: 10px; width: 1px; background: var(--gray-200); }
+.tl-row { display: flex; align-items: flex-start; gap: var(--space-3); position: relative; }
+.tl-row .node { width: 21px; height: 21px; flex: none; border-radius: var(--radius-full); background: var(--gray-100); display: inline-flex; align-items: center; justify-content: center; color: var(--gray-700); }
+.tl-row .node .icon { width: 11px; height: 11px; }
+.tl-row .txt { font: var(--type-caption); color: var(--gray-900); padding-top: 2px; }
+.tl-row .txt .ts { font: var(--type-data); color: var(--gray-700); margin-right: var(--space-2); }
+.dm-foot { border-top: 1px solid var(--gray-200); padding: var(--space-4) var(--space-6); display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2); }
+.input { width: 100%; font: var(--type-body); color: var(--gray-1000); background: var(--background-2); border: 1px solid var(--gray-400); border-radius: var(--radius-s); padding: var(--space-2) var(--space-3); }
+textarea.input { resize: vertical; min-height: 5.5rem; line-height: 1.6; }
+
+/* ============ settings menu + connect modal ============ */
+/* agent-app mark (dogfood r2; amends r1B.1 for these rows): the shipped
+   app icon, not a mono glyph — the vendor's mark in white on its own tile.
+   Vendor tile colors are identity, not meaning-hues. */
+.app-tile { width: 20px; height: 20px; flex: none; border-radius: var(--radius-s); display: inline-flex; align-items: center; justify-content: center; }
+.app-tile .icon { width: 12px; height: 12px; }
+.app-tile.claude { background: var(--brand-claude); color: #fff; }
+/* the official Codex mark is its own tile (dogfood r4): no added border or
+   fill — the mark's white plate + gradient glyph render full-size, corners
+   clipped to the shared tile radius so it sits square with the Claude tile */
+.app-tile.codex { background: transparent; overflow: hidden; }
+.app-tile.codex .icon { width: 20px; height: 20px; }
+.set-item { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.set-item .title { font: var(--type-body); color: var(--gray-1000); }
+.set-item .sub { font: var(--type-caption); color: var(--gray-800); }
+
+/* step-2 picker: project rows expand into indented session rows */
+.set-expand { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--space-2); background: transparent; border: 0; padding: 0; font: var(--type-body); color: var(--gray-1000); cursor: pointer; text-align: left; }
+.set-expand .icon { color: var(--gray-700); flex: none; }
+.set-expand .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* an expanded project row reveals its working directory (r1B.2 item 3):
+   muted data line under the name; the row's hover title carries the full
+   path in every state per the truncation law */
+.set-item .path { font: var(--type-data); color: var(--gray-800); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.set-sess { padding-left: calc(var(--space-3) + 1rem + var(--space-2)); }
+.set-sess:disabled { cursor: default; }
+.set-sess:disabled:hover { background: transparent; }
+.set-sess:disabled .cbx, .set-sess:disabled .title, .set-sess:disabled .end { opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-running .dot, .col-dot.running { animation: none; opacity: 1; transform: none; }
+}

@@ -1,0 +1,31 @@
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--background-1);
+  color: var(--gray-1000);
+  font: var(--type-body);
+}
+button { font: inherit; }
+a { color: var(--brand-text); }
+
+/* icons: one fill recipe, currentColor (Material Symbols Outlined, wght 500,
+   12px box) */
+.icon {
+  width: 12px; height: 12px; flex: none;
+  fill: currentColor; stroke: none;
+}
+/* selection fills the glyph: a selected carrier (the active nav destination)
+   sets --icon-o/--icon-f to swap its icons to the Material FILL-1 variant
+   (the custom props pierce the <use> shadow boundary). Hover and focus keep
+   the outline form; hue always stays the carrier's currentColor. */
+
+/* focus: the border lights up (dogfood r2) — one law for every focusable
+   thing: a 1px brand line on the component's own edge (outline-offset -1px),
+   never an outer ring or halo, no layout shift. Brand-filled carriers
+   override outline-color to --brand-ink where they're defined. */
+:focus-visible { outline: 1px solid var(--brand); outline-offset: -1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

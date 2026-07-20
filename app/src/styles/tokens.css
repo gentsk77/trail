@@ -1,0 +1,128 @@
+/* ============================================================
+   TOKENS. The only place raw values live; components use var()
+   references exclusively. A new token is a maintainer question,
+   not a default.
+
+   Palette: charcoal #252525 ink, electric blue #1E52F3, cool
+   sparse neutrals. Ported from design/design-system.html, the
+   source of truth for visual law.
+
+   The gray ramp encodes intent by step:
+     100 to 300   tinted fills and hover states
+     400 to 600   borders (default, hover, active)
+     700 to 800   muted foreground: icons, disabled, tertiary
+     900 to 1000  text (secondary, primary)
+   Backgrounds sit outside the ramp as their own pair.
+   ============================================================ */
+:root {
+  --background-1: #f7f7f8;   /* the page */
+  --background-2: #ffffff;   /* raised surfaces: cards, inputs, menus */
+
+  --gray-100: #f2f2f3;
+  --gray-200: #ebebed;
+  --gray-300: #e1e1e3;
+  --gray-400: #d4d4d8;
+  --gray-500: #bfbfc4;
+  --gray-600: #a0a0a6;
+  --gray-700: #86868c;
+  --gray-800: #6a6a70;
+  --gray-900: #515156;
+  --gray-1000: #252525;
+
+  --brand: #1e52f3;          /* the product's hand: primary action, selection, Ready */
+  --brand-hover: #1240d6;
+  --brand-ink: #ffffff;      /* text on brand fills */
+  --brand-text: #1e52f3;     /* brand as foreground: links, Ready text; lightened in dark */
+  --brand-soft: #e8eefe;     /* brand tinted fill: Ready badge, selection wash */
+  --brand-claude: #d97757;   /* third-party mark tile only (dogfood r2): the Claude
+                                spark's shipped app-icon orange; never a meaning-hue */
+
+  --green: #1b7a4a;          /* ratified: Done and nothing else */
+  --green-soft: #e4f3ea;
+  --amber: #8a5d0b;          /* ball in your court: Waiting — plus the demo-notice accent (ruled 2026-07-16) */
+  --amber-soft: #faf0dc;
+
+  /* heat ramp: four brand-hued frequency steps for the Progress grid;
+     five shades counting the empty gray-200 (D12, rounds 5-6). */
+  --heat-1: #b5c7fb;
+  --heat-2: #82a0f8;
+  --heat-3: #5079f6;
+  --heat-4: #1e52f3;
+
+  /* type roles: size / weight / tracking set together, never ad hoc.
+     The serif exists for the wordmark alone (ruled 2026-07-15); the brand
+     role outranks the page title so "Trail" reads largest. */
+  --font-sans: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, Consolas, monospace;
+  --font-serif: "Roboto Serif", Georgia, "Times New Roman", serif;
+  --type-brand: 400 1.5rem/1.2 var(--font-serif);      /* the wordmark, nothing else */
+  --type-title: 400 1.25rem/1.3 var(--font-sans);      /* tracking -0.01em */
+  --type-section: 400 1.0625rem/1.4 var(--font-sans);
+  --type-body: 400 0.875rem/1.6 var(--font-sans);
+  --type-label: 500 0.8125rem/1.4 var(--font-sans);
+  --type-caption: 400 0.75rem/1.5 var(--font-sans);
+  --type-data: 400 0.75rem/1.5 var(--font-mono);
+
+  /* spacing: 4px base; rhythm is 8 inside a group, 16 between groups, 32 between sections */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-16: 64px;
+
+  --radius-xs: 2px;          /* heat cells (ruled 2026-07-15) */
+  --radius-s: 6px;           /* controls, inputs, chips */
+  --radius-m: 12px;          /* cards, menus, modals */
+  --radius-full: 9999px;     /* pills, avatars */
+
+  /* elevation: layered low-alpha shadows, one recipe per tier */
+  --shadow-raised: 0 1px 2px rgba(16, 18, 24, 0.04), 0 2px 4px rgba(16, 18, 24, 0.04);
+  --shadow-float: 0 1px 1px rgba(16, 18, 24, 0.02), 0 4px 8px -4px rgba(16, 18, 24, 0.06), 0 16px 24px -8px rgba(16, 18, 24, 0.08);
+  /* the modal scrim (dogfood r3, supersedes no-scrim): dims the page so
+     the panel reads; outside click still closes through it */
+  --scrim: rgba(16, 18, 24, 0.45);
+
+  /* motion: nothing animates by default; when it must, one easing, three durations.
+     --duration-live is the sole continuous animation, reserved for Running. */
+  --ease: cubic-bezier(0.2, 0.8, 0.3, 1);
+  --duration-state: 150ms;   /* hovers, presses */
+  --duration-reveal: 200ms;  /* menus, popovers */
+  --duration-overlay: 300ms; /* modals, drawers */
+  --duration-live: 2000ms;   /* the Running indicator's breath */
+
+  /* focus carries no ring tokens (dogfood r2): the border lights up —
+     one global rule in base.css, nothing per component */
+}
+[data-theme="dark"] {
+  --background-1: #1b1b1c;
+  --background-2: #252525;   /* the brand charcoal, as raised surface */
+
+  --gray-100: #2c2c2e;
+  --gray-200: #323234;
+  --gray-300: #3a3a3d;
+  --gray-400: #454549;
+  --gray-500: #55555a;
+  --gray-600: #6e6e74;
+  --gray-700: #8a8a90;
+  --gray-800: #a5a5aa;
+  --gray-900: #c9c9cd;
+  --gray-1000: #f1f1f2;
+
+  --brand: #1e52f3;          /* fills keep the true blue; white ink holds 5.9:1 */
+  --brand-hover: #3d68f5;
+  --brand-ink: #ffffff;
+  --brand-text: #7aa0ff;     /* lightened for 4.5:1+ on dark surfaces */
+  --brand-soft: #20304f;
+  --brand-claude: #d97757;   /* vendor tile keeps its shipped color in both themes */
+
+  --green: #5bbe8b;
+  --green-soft: #1e3a2b;
+  --amber: #d9a94e;
+  --amber-soft: #3e3117;
+
+  --heat-1: #1f3978;
+  --heat-2: #1f41a1;
+  --heat-3: #1e4aca;
+  --heat-4: #1e52f3;
+
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-float: 0 1px 1px rgba(0, 0, 0, 0.2), 0 4px 8px -4px rgba(0, 0, 0, 0.4), 0 16px 24px -8px rgba(0, 0, 0, 0.5);
+  --scrim: rgba(0, 0, 0, 0.55);
+}

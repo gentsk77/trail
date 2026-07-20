@@ -1,0 +1,40 @@
+{
+  "name": "trail",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n web,api -c blue,green \"vite\" \"tsx watch server/index.ts\"",
+    "dev:web": "vite",
+    "demo": "vite --mode demo",
+    "dev:server": "tsx watch server/index.ts",
+    "build": "vite build",
+    "build:demo": "vite build --mode demo",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "migrate:backdate-imports": "tsx scripts/backdate-imported-tasks.ts",
+    "migrate:projects": "tsx scripts/migrate-projects.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "chokidar": "^4.0.1",
+    "fastify": "^5.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@fontsource/roboto": "^5.1.0",
+    "@fontsource/roboto-mono": "^5.1.0",
+    "@fontsource/roboto-serif": "^5.2.9",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "concurrently": "^9.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.1",
+    "vitest": "^3.0.0"
+  }
+}
