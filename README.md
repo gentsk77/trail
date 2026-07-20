@@ -35,6 +35,10 @@ python scripts/generate_design_md.py          # regenerate after editing the she
 python scripts/generate_design_md.py --check  # exit 1 if design.md is stale
 ```
 
+## Decision record
+
+[docs/decisions.md](docs/decisions.md) is the append-only, D-numbered log of product rulings — status model, view set, visual identity, dogfood batches. Code comments cite these numbers (D8, D24.1, …); the log is where they resolve.
+
 ## Status
 
 A working personal prototype, N=1 by design: built by and for a single agent-native operator. Substrate ingest is strictly read-only, and everything Trail writes back toward the substrate (procedure patches, dispatched sessions) is propose-only — the human ratifies.
