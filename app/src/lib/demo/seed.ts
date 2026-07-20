@@ -362,11 +362,11 @@ export function buildDemoData(today = new Date()): DemoData {
         "by hand. Ask: inline source links on numeric claims.",
         "",
         "## 2. The appendix is invisible (7)",
-        "Long filings truncate before exhibits; two teams call the",
+        "Long documents truncate before appendices; two teams call the",
         "summaries \"confidently partial\".",
         "",
         "## 3. Wanted: diff against wave-1 (6)",
-        "Repeat filers dominate; reviewers want what changed, not",
+        "Repeat submitters dominate; reviewers want what changed, not",
         "what is. Full tally: fixtures/wave2/tally.csv"
       ].join("\n")
     },
