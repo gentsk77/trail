@@ -4,6 +4,7 @@ import { StatusBadge } from "../components/StatusBadge";
 import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
 import { addDays, fmtDayLong, fmtShort, today, weekStart } from "../lib/dates";
+import { Skeleton } from "../components/ui/skeleton";
 
 /* Progress (D12, revised r1B): the activity grid is the long arc — twenty-
    six weeks, five shades, cell depth = the day's ready + done on one
@@ -133,7 +134,7 @@ export function Progress({ state, onOpenTask }: { state: AppState; onOpenTask: (
         <span className="lbl">{fmtDayLong(selected)}</span>
         <span className="count">
           {loading
-            ? <span className="skel skel-text" style={{ width: "7rem" }} />
+            ? <Skeleton text style={{ width: "7rem" }} />
             : daySummary(doneTasks.length, readyTasks.length)}
         </span>
       </div>

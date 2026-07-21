@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { fmtDay, fmtMonth, fromDay, today, toDay, weekStart } from "../lib/dates";
 import { Icon } from "./Icons";
+import { Button } from "./ui/button";
 
 /* Day-pick popover for the modal's Date field; same calendar grammar the
    Calendar control section owns. */
@@ -26,8 +27,8 @@ export function CalendarPopoverField({ anchor, onPick }: { anchor?: string; onPi
       <div className="cal-head">
         <span className="month">{fmtMonth(monthDate)}</span>
         <span className="nav">
-          <button type="button" className="btn btn-quiet btn-small btn-icon" aria-label="Previous month" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1))}><Icon name="chevl" /></button>
-          <button type="button" className="btn btn-quiet btn-small btn-icon" aria-label="Next month" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1))}><Icon name="chevr" /></button>
+          <Button variant="quiet" size="smallIcon" aria-label="Previous month" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1))}><Icon name="chevl" /></Button>
+          <Button variant="quiet" size="smallIcon" aria-label="Next month" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1))}><Icon name="chevr" /></Button>
         </span>
       </div>
       <div className="cal-grid">

@@ -5,7 +5,9 @@ import { fmtTs } from "../lib/dates";
 import type { AgentAppScan, ConnectProject, ConnectSelection } from "../lib/types";
 import { Icon } from "./Icons";
 import { ModalWrap } from "./ui/dialog";
-import { SelectAllBox } from "./SelectAllBox";
+import { Checkbox, CheckMark } from "./ui/checkbox";
+import { Button } from "./ui/button";
+import { Skeleton } from "./ui/skeleton";
 
 /* Connect flow (dogfood r1B): settings is a menu; this modal owns agent-app
    connection alone. Step 1 picks the app, step 2 picks the projects and
@@ -22,10 +24,10 @@ function AppRowSkeletons() {
     <>
       {[0, 1].map((i) => (
         <div key={i} className="list-row" style={{ cursor: "default" }} aria-hidden="true">
-          <span className="skel skel-circle" style={{ width: 18, height: 18, flex: "none" }} />
-          <span className="skel" style={{ width: 20, height: 20, borderRadius: "var(--radius-s)", flex: "none" }} />
-          <span className="skel skel-text" style={{ width: "7rem" }} />
-          <span className="end"><span className="skel skel-text" style={{ width: "5rem" }} /></span>
+          <Skeleton circle style={{ width: 18, height: 18, flex: "none" }} />
+          <Skeleton style={{ width: 20, height: 20, borderRadius: "var(--radius-s)", flex: "none" }} />
+          <Skeleton text style={{ width: "7rem" }} />
+          <span className="end"><Skeleton text style={{ width: "5rem" }} /></span>
         </div>
       ))}
     </>
@@ -37,9 +39,9 @@ function ProjectRowSkeletons() {
     <>
       {[0, 1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="list-row" style={{ cursor: "default" }} aria-hidden="true">
-          <span className="skel" style={{ width: 18, height: 18, borderRadius: "var(--radius-xs)", flex: "none" }} />
-          <span className="skel skel-text" style={{ width: `${11 + (i % 3) * 4}rem` }} />
-          <span className="end"><span className="skel skel-text" style={{ width: "5.5rem" }} /></span>
+          <Skeleton style={{ width: 18, height: 18, borderRadius: "var(--radius-xs)", flex: "none" }} />
+          <Skeleton text style={{ width: `${11 + (i % 3) * 4}rem` }} />
+          <span className="end"><Skeleton text style={{ width: "5.5rem" }} /></span>
         </div>
       ))}
     </>
@@ -133,7 +135,7 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
           <div className="dm-head">
             <h4 className="dm-title">
               <span className="title-text">Choose what to import</span>
-              <button type="button" className="btn btn-quiet btn-icon dm-close" aria-label="Close" onClick={onClose}><Icon name="x" /></button>
+              <Button className="dm-close" variant="quiet" size="icon" aria-label="Close" onClick={onClose}><Icon name="x" /></Button>
             </h4>
             <span className="dm-sub">
             {/* demo declaration (story 12): the import is a simulation */}
@@ -147,7 +149,7 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
               <div style={{ display: "flex", marginBottom: "var(--space-2)" }}>
                 {/* the label never flips (dogfood r3.1): the checkbox carries the state */}
                 <button type="button" className="sel-all" onClick={() => setAll(!allOn)}>
-                  <SelectAllBox all={allOn} some={included.size > 0} />
+                  <CheckMark all={allOn} some={included.size > 0} />
                   Select all
                 </button>
               </div>
@@ -167,14 +169,7 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
                 return (
                   <div key={p.storeDir}>
                     <div className="list-row">
-                      <button
-                        type="button"
-                        className={on ? "cbx checked" : "cbx"}
-                        aria-label={`Include ${p.name}`}
-                        onClick={() => toggleProject(p.storeDir)}
-                      >
-                        {on && <Icon name="check" />}
-                      </button>
+                      <Checkbox checked={on} ariaLabel={`Include ${p.name}`} onCheckedChange={() => toggleProject(p.storeDir)} />
                       <button type="button" className="set-expand" aria-expanded={open} title={p.dir} onClick={() => toggleExpanded(p.storeDir)}>
                         <Icon name={open ? "caret" : "chevr"} />
                         <Icon name="folder" />
@@ -200,7 +195,7 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
                           disabled={!on}
                           onClick={() => toggleSession(p.storeDir, s.id)}
                         >
-                          <span className={sessOn ? "cbx checked" : "cbx"}>{sessOn && <Icon name="check" />}</span>
+                          <CheckMark all={sessOn} />
                           <span className="title" style={s.label ? undefined : { color: "var(--gray-800)" }}>
                             {s.label ?? "Untitled"}
                           </span>
@@ -214,10 +209,10 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
             </div>
           </div>
           <div className="dm-foot">
-            <button type="button" className="btn btn-quiet" onClick={() => setStep("apps")}>Back</button>
-            <button type="button" className="btn btn-primary" disabled={busy || !candidates || included.size === 0} onClick={() => void importSelection()}>
+            <Button variant="quiet" onClick={() => setStep("apps")}>Back</Button>
+            <Button variant="primary" disabled={busy || !candidates || included.size === 0} onClick={() => void importSelection()}>
               {busy ? "Importing…" : "Import"}
-            </button>
+            </Button>
           </div>
         </div>
       </ModalWrap>
@@ -231,7 +226,7 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
           <h4 className="dm-title">
             {/* the settings menu item's name, verbatim (dogfood r4.1) */}
             <span className="title-text">Connect to agents</span>
-            <button type="button" className="btn btn-quiet btn-icon dm-close" aria-label="Close" onClick={onClose}><Icon name="x" /></button>
+            <Button className="dm-close" variant="quiet" size="icon" aria-label="Close" onClick={onClose}><Icon name="x" /></Button>
           </h4>
           <span className="dm-sub">
             {/* demo declaration (story 12): a visitor must never believe
@@ -256,7 +251,7 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
                   disabled={!selectable}
                   onClick={() => app.id === "claude-code" && setAppChecked(!appChecked)}
                 >
-                  <span className={on ? "cbx checked" : "cbx"}>{on && <Icon name="check" />}</span>
+                  <CheckMark all={on} />
                   <span className={`app-tile ${app.id === "claude-code" ? "claude" : "codex"}`}>
                     <Icon name={app.id === "claude-code" ? "claude" : "codex"} />
                   </span>
@@ -272,8 +267,8 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
           </div>
         </div>
         <div className="dm-foot">
-          <button type="button" className="btn btn-quiet" onClick={onClose}>Cancel</button>
-          <button type="button" className="btn btn-primary" disabled={!appChecked || !claude?.found} onClick={() => setStep("projects")}>Continue</button>
+          <Button variant="quiet" onClick={onClose}>Cancel</Button>
+          <Button variant="primary" disabled={!appChecked || !claude?.found} onClick={() => setStep("projects")}>Continue</Button>
         </div>
       </div>
     </ModalWrap>

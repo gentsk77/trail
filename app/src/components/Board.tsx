@@ -3,6 +3,7 @@ import { BOARD_COLUMNS, STATUS_LABEL } from "../lib/status";
 import type { Project, Status, Task } from "../lib/types";
 import { Icon } from "./Icons";
 import { ProjectPill, projectName } from "./ProjectPill";
+import { Button } from "./ui/button";
 
 /* The kanban: five columns minus Shelved; the column carries state, cards
    stay clean (title, project pill, nothing else). The whole column below
@@ -29,9 +30,9 @@ export function Board({ tasks, projects, onMove, onOpen, onQuickAdd }: {
               <span className={`col-dot ${status}`} />
               {STATUS_LABEL[status]} <span className="count">{cards.length}</span>
               {status === "planned" && (
-                <button type="button" className="btn btn-quiet btn-icon" aria-label="Add task" onClick={() => setAdding(!adding)}>
+                <Button variant="quiet" size="icon" aria-label="Add task" onClick={() => setAdding(!adding)}>
                   <Icon name="plus" />
-                </button>
+                </Button>
               )}
             </div>
             {status === "planned" && adding && (
@@ -114,9 +115,9 @@ function QuickAdd({ onCreate, onCancel }: { onCreate: (title: string) => void; o
           if (e.key === "Escape") onCancel();
         }}
       />
-      <button type="button" className="btn btn-primary btn-icon" aria-label="Create task" onClick={submit}>
+      <Button variant="primary" size="icon" aria-label="Create task" onClick={submit}>
         <Icon name="check" />
-      </button>
+      </Button>
     </div>
   );
 }

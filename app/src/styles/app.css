@@ -165,8 +165,13 @@
    on white / light-gray on charcoal — visible without hitting either
    pole. The demo-notice amber stays the banner's; the toast carries
    contrast, not hue. */
-.demo-toast { position: fixed; bottom: var(--space-6); left: 50%; transform: translateX(-50%); z-index: 50; max-width: min(28rem, calc(100vw - 2rem)); display: flex; align-items: flex-start; gap: var(--space-2); background: var(--gray-900); border: 0; border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-2) var(--space-4); font: var(--type-body); color: var(--background-2); }
+.demo-toast { max-width: min(28rem, calc(100vw - 2rem)); width: max-content; display: flex; align-items: flex-start; gap: var(--space-2); background: var(--gray-900); border: 0; border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-2) var(--space-4); font: var(--type-body); color: var(--background-2); }
 .demo-toast .icon { width: 14px; height: 14px; flex: none; margin-top: 3px; }
+/* Sonner owns positioning; its entrance/exit transforms are killed —
+   the ruled toast appears and leaves plainly (motion = liveness only),
+   and !important is the only seat above Sonner's injected stylesheet */
+[data-sonner-toast] { transition: none !important; animation: none !important; transform: none !important; }
+[data-sonner-toaster] { font: var(--type-body); }
 /* views render into one centered column capped at the sheet's wide demo
    frame (78rem); on ultrawide viewports the surplus becomes symmetric
    gutters instead of stretching the board */
@@ -182,7 +187,8 @@
 .seg { display: inline-flex; align-items: center; background: var(--gray-200); border-radius: var(--radius-full); padding: 2px; }
 .seg .btn-small { color: var(--gray-900); height: 1.625rem; border-radius: var(--radius-full); }
 .seg .btn-small:hover { background: transparent; color: var(--gray-1000); }
-.seg .btn-small.active { background: var(--background-2); color: var(--gray-1000); }
+/* the active thumb keys off Radix data-state (ui/toggle-group) */
+.seg .btn-small[data-state="on"] { background: var(--background-2); color: var(--gray-1000); }
 .jump { width: 5rem; padding: 0; text-align: center; }
 .btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.875rem; height: 1.875rem; padding: 0; }
 .picker { display: inline-flex; align-items: center; gap: var(--space-2); }

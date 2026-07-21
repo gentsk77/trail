@@ -5,6 +5,7 @@ import { currentTheme, setTheme } from "../lib/theme";
 import { Icon, type IconName } from "./Icons";
 import { Popover } from "./ui/popover";
 import { Tip } from "./ui/tooltip";
+import { Button } from "./ui/button";
 
 export type ViewName = "dashboard" | "inbox" | "backlog" | "progress" | "projects";
 
@@ -116,14 +117,14 @@ export function Sidebar({ state, view, onNavigate, onOpenConnect }: {
       <div className="side-head">
         {!collapsed && <span className="wordmark">Trail</span>}
         <RailTip label="Expand">
-          <button
-            type="button"
-            className="btn btn-quiet btn-small btn-icon nav-toggle"
+          <Button
+           
+            className="nav-toggle" variant="quiet" size="smallIcon"
             aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
             onClick={toggleCollapsed}
           >
             <Icon name={collapsed ? "expand" : "collapse"} />
-          </button>
+          </Button>
         </RailTip>
       </div>
       {NAV.map((item) => (
@@ -158,7 +159,7 @@ export function Sidebar({ state, view, onNavigate, onOpenConnect }: {
             <h4>Everything here is fictional</h4>
             <p>Connect and dispatch are simulated, and nothing reads your machine. For the full workflow, watch the recorded demo.</p>
             <div className="foot">
-              <button type="button" className="btn btn-secondary btn-small" onClick={() => setNoteOpen(false)}>Got it</button>
+              <Button variant="secondary" size="small" onClick={() => setNoteOpen(false)}>Got it</Button>
             </div>
           </div>
         </Popover>

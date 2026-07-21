@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 import { addDays, fmtDay, fmtMonth, fmtWeek, fromDay, inWeek, toDay, today, weekStart } from "../lib/dates";
 import { Icon } from "./Icons";
 import { Popover } from "./ui/popover";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { Button } from "./ui/button";
 
 export type CalMode = "day" | "week";
 
@@ -20,29 +22,29 @@ export function CalendarControl({ mode, anchor, onMode, onAnchor }: {
   const step = mode === "day" ? 1 : 7;
   return (
     <>
-      <span className="seg">
-        <button type="button" className={mode === "week" ? "btn btn-small active" : "btn btn-small"} onClick={() => onMode("week")}>Week</button>
-        <button type="button" className={mode === "day" ? "btn btn-small active" : "btn btn-small"} onClick={() => onMode("day")}>Day</button>
-      </span>
-      <button type="button" className="btn btn-quiet btn-small jump" onClick={() => onAnchor(today())}>
+      <ToggleGroup value={mode} onValueChange={(v) => onMode(v as CalMode)} ariaLabel="Time scope">
+        <ToggleGroupItem value="week">Week</ToggleGroupItem>
+        <ToggleGroupItem value="day">Day</ToggleGroupItem>
+      </ToggleGroup>
+      <Button className="jump" variant="quiet" size="small" onClick={() => onAnchor(today())}>
         {mode === "day" ? "Today" : "This week"}
-      </button>
-      <button type="button" className="btn btn-quiet btn-small btn-icon" aria-label={mode === "day" ? "Previous day" : "Previous week"} onClick={() => onAnchor(addDays(anchor, -step))}>
+      </Button>
+      <Button variant="quiet" size="smallIcon" aria-label={mode === "day" ? "Previous day" : "Previous week"} onClick={() => onAnchor(addDays(anchor, -step))}>
         <Icon name="chevl" />
-      </button>
-      <button type="button" ref={pickerRef} className="btn btn-secondary btn-small picker fixed" onClick={() => setOpen(!open)}>
+      </Button>
+      <Button ref={pickerRef} className="picker fixed" variant="secondary" size="small" onClick={() => setOpen(!open)}>
         <Icon name="calendar" />
         <span className="lbl">{mode === "day" ? fmtDay(anchor) : fmtWeek(anchor)}</span>
         <svg className="icon" style={{ width: 10, height: 10 }} aria-hidden="true"><use href="#i-caret" /></svg>
-      </button>
+      </Button>
       {open && (
         <Popover anchorRef={pickerRef} align="end" onClose={() => setOpen(false)}>
           <CalendarPopover mode={mode} anchor={anchor} onPick={(d) => { onAnchor(d); setOpen(false); }} />
         </Popover>
       )}
-      <button type="button" className="btn btn-quiet btn-small btn-icon" aria-label={mode === "day" ? "Next day" : "Next week"} onClick={() => onAnchor(addDays(anchor, step))}>
+      <Button variant="quiet" size="smallIcon" aria-label={mode === "day" ? "Next day" : "Next week"} onClick={() => onAnchor(addDays(anchor, step))}>
         <Icon name="chevr" />
-      </button>
+      </Button>
     </>
   );
 }
@@ -73,8 +75,8 @@ function CalendarPopover({ mode, anchor, onPick }: { mode: CalMode; anchor: stri
       <div className="cal-head">
         <span className="month">{fmtMonth(monthDate)}</span>
         <span className="nav">
-          <button type="button" className="btn btn-quiet btn-small btn-icon" aria-label="Previous month" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1))}><Icon name="chevl" /></button>
-          <button type="button" className="btn btn-quiet btn-small btn-icon" aria-label="Next month" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1))}><Icon name="chevr" /></button>
+          <Button variant="quiet" size="smallIcon" aria-label="Previous month" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() - 1, 1))}><Icon name="chevl" /></Button>
+          <Button variant="quiet" size="smallIcon" aria-label="Next month" onClick={() => setMonthDate(new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1))}><Icon name="chevr" /></Button>
         </span>
       </div>
       <div className="cal-grid">

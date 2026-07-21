@@ -3,6 +3,8 @@ import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
 import { Icon } from "./Icons";
 import { ModalWrap } from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 /* Project modal (D18): the established modal grammar, single narrow
    column — name and directory, nothing else. Directory is optional
@@ -75,17 +77,16 @@ export function ProjectModal({ state, projectId, onClose }: {
         <div className="dm-head">
           <h4 className="dm-title">
             <span className="title-text">{isCreate ? "New project" : "Edit project"}</span>
-            <button type="button" className="btn btn-quiet btn-icon dm-close" aria-label="Close" onClick={onClose}>
+            <Button className="dm-close" variant="quiet" size="icon" aria-label="Close" onClick={onClose}>
               <Icon name="x" />
-            </button>
+            </Button>
           </h4>
         </div>
         <div className="dm-body dm-scroll">
           <div className="dm-main">
             <div className="field">
               <span className="lbl">Name</span>
-              <input
-                className="input"
+              <Input
                 type="text"
                 value={name}
                 autoFocus={isCreate}
@@ -96,27 +97,26 @@ export function ProjectModal({ state, projectId, onClose }: {
             <div className="field">
               <span className="lbl">Directory</span>
               <div className="dir-row">
-                <input
-                  className="input"
+                <Input
                   type="text"
                   value={dir}
                   aria-label="Project directory"
                   onChange={(e) => setDir(e.target.value)}
                 />
                 {state.client.mode === "live" && (
-                  <button type="button" className="btn btn-secondary" disabled={picking} onClick={() => void browse()}>
+                  <Button variant="secondary" disabled={picking} onClick={() => void browse()}>
                     Choose folder
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
           </div>
         </div>
         <div className="dm-foot">
-          <button type="button" className="btn btn-quiet" onClick={onClose}>Cancel</button>
-          <button type="button" className="btn btn-primary" disabled={!canSave} onClick={() => void save()}>
+          <Button variant="quiet" onClick={onClose}>Cancel</Button>
+          <Button variant="primary" disabled={!canSave} onClick={() => void save()}>
             {isCreate ? "Create" : "Save"}
-          </button>
+          </Button>
         </div>
       </div>
     </ModalWrap>

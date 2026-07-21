@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArtifactTile } from "../components/ArtifactTile";
 import { Icon } from "../components/Icons";
+import { RowCheckbox } from "../components/ui/checkbox";
 import { Popover } from "../components/ui/popover";
 import { ProjectPill, projectName } from "../components/ProjectPill";
 import type { AppState } from "../lib/appState";
@@ -9,6 +10,7 @@ import type { InboxResult, InboxSignoffCard, InboxWaitingCard } from "../lib/inb
 import { renderInlineMd } from "../lib/md";
 import type { TrailClient } from "../lib/api";
 import type { Artifact, Task } from "../lib/types";
+import { Button } from "../components/ui/button";
 
 /* The Inbox (D17): everything awaiting the operator's judgment, two
    sections, one primary in the whole view. Needs sign-off = Ready tasks
@@ -132,9 +134,9 @@ export function Inbox({ state }: {
             <span className="n">{shownOf(signoff.length, inbox.signoff.length)}</span>
             <span className="side">
               <span>
-                <button type="button" ref={projectRef} className="btn btn-quiet btn-small picker" onClick={() => setMenu(menu === "project" ? null : "project")}>
+                <Button ref={projectRef} className="picker" variant="quiet" size="small" onClick={() => setMenu(menu === "project" ? null : "project")}>
                   <Icon name="folder" />Project
-                </button>
+                </Button>
                 {menu === "project" && (
                   <Popover anchorRef={projectRef} align="end" onClose={() => setMenu(null)}><div className="menu">
                     {usedProjects.map((p) => (
@@ -160,14 +162,14 @@ export function Inbox({ state }: {
                   </div></Popover>
                 )}
               </span>
-              <button
-                type="button"
-                className="btn btn-primary btn-small"
+              <Button
+               
+                variant="primary" size="small"
                 disabled={busy || selected.length === 0}
                 onClick={() => void signOffSelected()}
               >
                 Sign off selected
-              </button>
+              </Button>
             </span>
           </div>
           {signoff.length === 0 && (
@@ -234,19 +236,7 @@ function SignoffCard({ card, client, project, checked, expanded, onCheck, onExpa
           onExpand();
         }}
       >
-        <span
-          role="checkbox"
-          aria-checked={checked}
-          aria-label={`Select ${card.task.title}`}
-          tabIndex={0}
-          className={checked ? "cbx checked" : "cbx"}
-          onClick={(e) => { e.stopPropagation(); onCheck(); }}
-          onKeyDown={(e) => {
-            if (e.key === " " || e.key === "Enter") { e.preventDefault(); e.stopPropagation(); onCheck(); }
-          }}
-        >
-          <Icon name="check" />
-        </span>
+        <RowCheckbox checked={checked} ariaLabel={`Select ${card.task.title}`} onToggle={onCheck} />
         <button
           type="button"
           className="ib-caret"
