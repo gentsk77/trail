@@ -112,20 +112,19 @@
 .sidebar.collapsed .nav-item { justify-content: center; position: relative; }
 .sidebar.collapsed .nav-dot { position: absolute; top: var(--space-1); right: var(--space-1); margin: 0; }
 .sidebar.collapsed .demo-banner { justify-content: center; }
-/* hover tips, rail only: micro-popovers on the menu chrome; a beat of
-   delay in, gone at once on leave */
-.sidebar.collapsed [data-tip]::after {
-  content: attr(data-tip); position: absolute; left: calc(100% + var(--space-2)); top: 50%; transform: translateY(-50%);
-  z-index: 30; white-space: nowrap; font: var(--type-caption); color: var(--gray-1000);
+/* hover tips, rail only (ui/tooltip.tsx on Radix): micro-popovers on the
+   menu chrome — caption type, background-2, gray-300 border, float
+   shadow; the 200ms beat in is the primitive's delay, gone at once on
+   leave (no exit animation). Portaling retires the old z literal. */
+.tip {
+  white-space: nowrap; font: var(--type-caption); color: var(--gray-1000);
   background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-s);
   padding: var(--space-1) var(--space-2); box-shadow: var(--shadow-float);
-  opacity: 0; pointer-events: none; transition: opacity var(--duration-state) var(--ease);
+  animation: reveal-in var(--duration-state) var(--ease);
 }
-.sidebar.collapsed [data-tip]:hover::after { opacity: 1; transition-delay: 200ms; }
-.sidebar.collapsed .demo-banner[data-tip], .sidebar.collapsed .nav-toggle[data-tip] { position: relative; }
 /* the resize handle: a 6px grab strip straddling the border; the
    hairline lights on hover and while dragging; double-click resets */
-.sidebar-rsz { position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; z-index: 20; touch-action: none; }
+.sidebar-rsz { position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; touch-action: none; }
 .sidebar-rsz::after { content: ""; position: absolute; top: 0; bottom: 0; left: 2px; width: 2px; background: transparent; transition: background-color var(--duration-state) var(--ease); }
 .sidebar-rsz:hover::after, .sidebar.dragging .sidebar-rsz::after { background: var(--gray-500); }
 .nav-item { display: flex; align-items: center; gap: var(--space-2); width: 100%; text-align: left; font: var(--type-body); color: var(--gray-900); background: transparent; border: 0; border-radius: var(--radius-s); padding: var(--space-2) var(--space-3); cursor: pointer; transition: background-color var(--duration-state) var(--ease); }
@@ -259,11 +258,15 @@
 /* None sits apart from the real options (r1B.3 nit) */
 .menu-item.sep-above { border-top: 1px solid var(--gray-200); margin-top: var(--space-1); border-top-left-radius: 0; border-top-right-radius: 0; }
 .menu-label { font: var(--type-caption); color: var(--gray-800); padding: var(--space-2) var(--space-3) var(--space-1); }
-/* the popover primitive's panel (Popover.tsx owns placement): fixed +
-   portaled so opening one never reflows or scrolls an ancestor; sits
-   above the modal layer (dm-wrap z 40); overlong content scrolls inside */
-.popover { position: fixed; z-index: 50; display: flex; flex-direction: column; }
+/* the popover primitive's panel (ui/popover.tsx, Radix-positioned):
+   portaled so opening one never reflows or scrolls an ancestor; portal
+   order layers it above the modal layer — no z literal (D31, closing the
+   z-scale question); height caps at the ruled min(20rem, available) via
+   the Radix measurement; overlong content scrolls inside. The 200ms
+   reveal is the ruled entrance (C2, re-timed to tokens). */
+.popover { display: flex; flex-direction: column; max-height: min(20rem, var(--radix-popover-content-available-height, 20rem)); animation: reveal-in var(--duration-reveal) var(--ease); }
 .popover > * { min-height: 0; overflow-y: auto; }
+@keyframes reveal-in { from { opacity: 0; transform: translateY(-2px); } }
 
 /* ============ selection checkbox ============ */
 .cbx { width: 1rem; height: 1rem; flex: none; border: 1px solid var(--gray-700); border-radius: var(--radius-full); background: var(--background-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
@@ -465,8 +468,13 @@
 /* the wrapper dims the page behind the panel (--scrim; dogfood r3,
    superseding the no-scrim ruling) and stays the click-catcher — outside
    click closes. Placement is dead center, both axes (dogfood r2); the
-   panel caps at the padded viewport and keeps its float shadow. */
-.dm-wrap { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; padding: var(--space-10) var(--space-6); background: var(--scrim); }
+   panel caps at the padded viewport and keeps its float shadow. Radix
+   portal order carries the layering — no z literal (D31) — and the
+   entrance rides the ruled overlay duration (C2). */
+.dm-wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: var(--space-10) var(--space-6); background: var(--scrim); animation: overlay-in var(--duration-overlay) var(--ease); }
+.dm-wrap > .dm { animation: panel-in var(--duration-overlay) var(--ease); }
+@keyframes overlay-in { from { background: transparent; } }
+@keyframes panel-in { from { opacity: 0; transform: scale(0.98); } }
 /* title-row action (dogfood r3): Dispatch rides the header grammar,
    pinned to the row's end */
 .dm-title .dm-act-btn { margin-left: auto; flex: none; }

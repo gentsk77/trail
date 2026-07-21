@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../components/Icons";
-import { Popover } from "../components/Popover";
+import { Popover } from "../components/ui/popover";
 import { ProjectPill, projectName } from "../components/ProjectPill";
 import { StatusBadge } from "../components/StatusBadge";
 import type { AppState } from "../lib/appState";

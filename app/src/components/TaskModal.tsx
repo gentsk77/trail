@@ -7,8 +7,8 @@ import { STATUSES, STATUS_LABEL } from "../lib/status";
 import type { Objective, Status } from "../lib/types";
 import { artifactIcon } from "./ArtifactTile";
 import { Icon, type IconName } from "./Icons";
-import { ModalWrap } from "./Modal";
-import { Popover } from "./Popover";
+import { ModalWrap } from "./ui/dialog";
+import { Popover } from "./ui/popover";
 import { ProjectPill, projectName } from "./ProjectPill";
 import { StatusBadge } from "./StatusBadge";
 import { CalendarPopoverField } from "./CalendarField";
@@ -176,7 +176,7 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
      detail lands */
   if (!task) {
     return (
-      <ModalWrap onClose={onClose}>
+      <ModalWrap label="Task detail" onClose={onClose}>
         <div className="dm" style={{ minHeight: "28rem" }} aria-busy="true">
           <div className="dm-head">
             <span className="crumbs"><span className="skel skel-text" style={{ width: "9rem" }} /></span>
@@ -362,7 +362,7 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
   timeline.sort((a, b) => a.at.localeCompare(b.at));
 
   return (
-    <ModalWrap onClose={onClose}>
+    <ModalWrap label={isCreate ? "New task" : "Task detail"} onClose={onClose}>
       <div className="dm">
         <div className="dm-head">
           {isCreate ? (
@@ -635,7 +635,9 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
         </div>
       </div>
       {packText && (
-        <div className="dm-wrap" onMouseDown={(e) => { if (e.target === e.currentTarget) setPackText(null); }}>
+        /* nested dialog: Radix layers it above the task modal and scopes
+           Esc to this layer (the hand-rolled wrapper had neither, review V1) */
+        <ModalWrap label="Context pack" onClose={() => setPackText(null)}>
           <div className="dm" style={{ width: "42rem" }}>
             <div className="dm-head">
               <h4 className="dm-title">
@@ -656,7 +658,7 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
               <button type="button" className="btn btn-quiet" onClick={() => setPackText(null)}>Close</button>
             </div>
           </div>
-        </div>
+        </ModalWrap>
       )}
     </ModalWrap>
   );

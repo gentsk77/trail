@@ -3,8 +3,8 @@ import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
 import { fmtShort } from "../lib/dates";
 import { Icon } from "./Icons";
-import { ModalWrap } from "./Modal";
-import { Popover } from "./Popover";
+import { ModalWrap } from "./ui/dialog";
+import { Popover } from "./ui/popover";
 import { ProjectPill, projectName } from "./ProjectPill";
 import { StatusBadge } from "./StatusBadge";
 
@@ -126,7 +126,7 @@ export function ObjectiveModal({ state, objectiveId, onClose, onOpenTask, onOpen
     : [done > 0 ? `${done} done` : null, open > 0 ? `${open} open` : null].filter(Boolean).join(" · ");
 
   return (
-    <ModalWrap onClose={onClose}>
+    <ModalWrap label={isCreate ? "New objective" : "Objective detail"} onClose={onClose}>
       {/* one height either mode (dogfood r4.1): the blank create panel
           stands as tall as a typical view, so the swap never shrinks it */}
       <div className="dm" style={{ minHeight: "26rem" }}>

@@ -7,6 +7,7 @@ import { ObjectiveModal } from "./components/ObjectiveModal";
 import { ProjectModal } from "./components/ProjectModal";
 import { Sidebar, type ViewName } from "./components/Sidebar";
 import { TaskModal } from "./components/TaskModal";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { HttpClient } from "./lib/api";
 import { AppState } from "./lib/appState";
 import { DemoClient } from "./lib/demo/DemoClient";
@@ -43,7 +44,7 @@ export function App() {
   const close = () => setModal(null);
 
   return (
-    <>
+    <TooltipProvider>
       <IconDefs />
       <div className="shell">
         <Sidebar state={state} view={view} onNavigate={setView} onOpenConnect={() => setModal({ kind: "connect" })} />
@@ -88,6 +89,6 @@ export function App() {
       )}
       {/* the demo-notice toast (story 12): demo mode only, never live */}
       {state.client.mode === "demo" && <DemoNotice />}
-    </>
+    </TooltipProvider>
   );
 }

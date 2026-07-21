@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Icon } from "../components/Icons";
-import { Popover } from "../components/Popover";
+import { Popover } from "../components/ui/popover";
 import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
 

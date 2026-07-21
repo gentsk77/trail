@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
 import { Icon } from "./Icons";
-import { ModalWrap } from "./Modal";
+import { ModalWrap } from "./ui/dialog";
 
 /* Project modal (D18): the established modal grammar, single narrow
    column — name and directory, nothing else. Directory is optional
@@ -70,7 +70,7 @@ export function ProjectModal({ state, projectId, onClose }: {
   }, [projectId]);
 
   return (
-    <ModalWrap onClose={onClose}>
+    <ModalWrap label={isCreate ? "New project" : "Edit project"} onClose={onClose}>
       <div className="dm" style={{ width: "26rem" }}>
         <div className="dm-head">
           <h4 className="dm-title">

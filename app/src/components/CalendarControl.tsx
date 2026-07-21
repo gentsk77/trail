@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { addDays, fmtDay, fmtMonth, fmtWeek, fromDay, inWeek, toDay, today, weekStart } from "../lib/dates";
 import { Icon } from "./Icons";
-import { Popover } from "./Popover";
+import { Popover } from "./ui/popover";
 
 export type CalMode = "day" | "week";
 

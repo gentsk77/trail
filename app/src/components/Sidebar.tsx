@@ -3,7 +3,8 @@ import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
 import { currentTheme, setTheme } from "../lib/theme";
 import { Icon, type IconName } from "./Icons";
-import { Popover } from "./Popover";
+import { Popover } from "./ui/popover";
+import { Tip } from "./ui/tooltip";
 
 export type ViewName = "dashboard" | "inbox" | "backlog" | "progress" | "projects";
 
@@ -102,6 +103,11 @@ export function Sidebar({ state, view, onNavigate, onOpenConnect }: {
     localStorage.setItem(WIDTH_KEY, String(WIDTH_DEFAULT));
   };
 
+  /* hover tips are the rail's alone (ui r1): labels sit inline while
+     expanded, so the tooltip mounts only when collapsed */
+  const RailTip = ({ label, children }: { label: string; children: React.ReactElement }) =>
+    collapsed ? <Tip label={label}>{children}</Tip> : children;
+
   const cls = ["sidebar"];
   if (collapsed) cls.push("collapsed");
   if (dragging) cls.push("dragging");
@@ -109,39 +115,42 @@ export function Sidebar({ state, view, onNavigate, onOpenConnect }: {
     <nav className={cls.join(" ")} style={collapsed ? undefined : { width }}>
       <div className="side-head">
         {!collapsed && <span className="wordmark">Trail</span>}
-        <button
-          type="button"
-          className="btn btn-quiet btn-small btn-icon nav-toggle"
-          aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
-          data-tip="Expand"
-          onClick={toggleCollapsed}
-        >
-          <Icon name={collapsed ? "expand" : "collapse"} />
-        </button>
+        <RailTip label="Expand">
+          <button
+            type="button"
+            className="btn btn-quiet btn-small btn-icon nav-toggle"
+            aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
+            onClick={toggleCollapsed}
+          >
+            <Icon name={collapsed ? "expand" : "collapse"} />
+          </button>
+        </RailTip>
       </div>
       {NAV.map((item) => (
-        <button
-          key={item.view}
-          type="button"
-          className={item.view === view ? "nav-item active" : "nav-item"}
-          aria-label={item.label}
-          data-tip={item.label}
-          onClick={() => onNavigate(item.view)}
-        >
-          <Icon name={item.icon} />
-          {!collapsed && item.label}
-          {item.view === "inbox" && awaits && <span className="nav-dot" />}
-        </button>
+        <RailTip label={item.label} key={item.view}>
+          <button
+            type="button"
+            className={item.view === view ? "nav-item active" : "nav-item"}
+            aria-label={item.label}
+            onClick={() => onNavigate(item.view)}
+          >
+            <Icon name={item.icon} />
+            {!collapsed && item.label}
+            {item.view === "inbox" && awaits && <span className="nav-dot" />}
+          </button>
+        </RailTip>
       ))}
       {/* the banner sits above the footer separator (r6), the
           update-notification grammar; the popover portals away, so the
           banner and the footer stay adjacent siblings */}
       {demo && (
-        <button type="button" ref={noteTrigger} className="demo-banner" aria-label="Demo data" data-tip="Demo data" onClick={() => setNoteOpen(!noteOpen)}>
-          <Icon name="demo" />
-          {!collapsed && <span className="title">Demo data</span>}
-          {!collapsed && <Icon name="chevr" className="go" />}
-        </button>
+        <RailTip label="Demo data">
+          <button type="button" ref={noteTrigger} className="demo-banner" aria-label="Demo data" onClick={() => setNoteOpen(!noteOpen)}>
+            <Icon name="demo" />
+            {!collapsed && <span className="title">Demo data</span>}
+            {!collapsed && <Icon name="chevr" className="go" />}
+          </button>
+        </RailTip>
       )}
       {noteOpen && (
         <Popover anchorRef={noteTrigger} onClose={() => setNoteOpen(false)}>
@@ -155,10 +164,12 @@ export function Sidebar({ state, view, onNavigate, onOpenConnect }: {
         </Popover>
       )}
       <div className="sidebar-foot">
-        <button type="button" ref={trigger} className="nav-item" aria-label="Settings" data-tip="Settings" onClick={() => setMenuOpen(!menuOpen)}>
-          <Icon name="settings" />
-          {!collapsed && "Settings"}
-        </button>
+        <RailTip label="Settings">
+          <button type="button" ref={trigger} className="nav-item" aria-label="Settings" onClick={() => setMenuOpen(!menuOpen)}>
+            <Icon name="settings" />
+            {!collapsed && "Settings"}
+          </button>
+        </RailTip>
         {menuOpen && (
           <Popover anchorRef={trigger} onClose={() => setMenuOpen(false)}><div className="menu">
             <button

@@ -4,7 +4,7 @@ import { useBootstrap } from "../lib/appState";
 import { fmtTs } from "../lib/dates";
 import type { AgentAppScan, ConnectProject, ConnectSelection } from "../lib/types";
 import { Icon } from "./Icons";
-import { ModalWrap } from "./Modal";
+import { ModalWrap } from "./ui/dialog";
 import { SelectAllBox } from "./SelectAllBox";
 
 /* Connect flow (dogfood r1B): settings is a menu; this modal owns agent-app
@@ -122,7 +122,7 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
 
   if (step === "projects") {
     return (
-      <ModalWrap onClose={onClose}>
+      <ModalWrap label="Choose what to import" onClose={onClose}>
         {/* 40rem: the row spends ~76px on checkbox + carets + folder and up
             to ~140px on the count column ("12 of 34 sessions", data type);
             40rem leaves the name ~420px — a 40+char project or worktree
@@ -225,7 +225,7 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
   }
 
   return (
-    <ModalWrap onClose={onClose}>
+    <ModalWrap label="Connect to agents" onClose={onClose}>
       <div className="dm" style={{ width: "26rem" }}>
         <div className="dm-head">
           <h4 className="dm-title">
