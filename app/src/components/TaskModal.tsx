@@ -11,7 +11,7 @@ import { ModalWrap } from "./ui/dialog";
 import { Popover } from "./ui/popover";
 import { ProjectPill, projectName } from "./ProjectPill";
 import { StatusBadge } from "./StatusBadge";
-import { CalendarPopoverField } from "./CalendarField";
+import { Calendar } from "./ui/calendar";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 
@@ -557,7 +557,7 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
               </button>
               {openMenu === "date" && (
                 <Popover anchorRef={dateRef} onClose={() => setOpenMenu(null)}>
-                  <CalendarPopoverField anchor={task.date} onPick={(d) => { setOpenMenu(null); applyPatch({ date: d }); }} />
+                  <Calendar anchor={task.date} onPick={(d) => { setOpenMenu(null); applyPatch({ date: d }); }} />
                 </Popover>
               )}
             </div>

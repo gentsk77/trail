@@ -5,6 +5,7 @@ import { fmtTs } from "../lib/dates";
 import type { AgentAppScan, ConnectProject, ConnectSelection } from "../lib/types";
 import { Icon } from "./Icons";
 import { ModalWrap } from "./ui/dialog";
+import { Badge } from "./ui/badge";
 import { Checkbox, CheckMark } from "./ui/checkbox";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
@@ -258,8 +259,8 @@ export function ConnectModal({ state, onClose }: { state: AppState; onClose: () 
                   <span className="title">{app.name}</span>
                   {/* state rides a chip beside the name (dogfood r4): every
                       row stays one line tall */}
-                  {app.id === "claude-code" && connected && <span className="chip"><span className="lbl">Connected</span></span>}
-                  {!app.importable && app.found && <span className="chip"><span className="lbl">Not supported</span></span>}
+                  {app.id === "claude-code" && connected && <Badge variant="chip"><span className="lbl">Connected</span></Badge>}
+                  {!app.importable && app.found && <Badge variant="chip"><span className="lbl">Not supported</span></Badge>}
                   <span className="end">{app.found ? `${app.sessionCount} sessions` : "Not found"}</span>
                 </button>
               );

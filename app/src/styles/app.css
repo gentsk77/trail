@@ -197,22 +197,26 @@
 .picker.fixed .lbl { flex: 1; text-align: center; }
 
 /* 15rem: fits "September 2026" + nav with room, ~28px day cells; 17rem
-   read as dead space in week mode (dogfood r1B item 11) */
-.cal { width: 15rem; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-4); }
-.cal-head { display: flex; align-items: center; margin-bottom: var(--space-2); }
-.cal-head .month { font: var(--type-label); color: var(--gray-1000); }
-.cal-head .nav { margin-left: auto; display: flex; gap: var(--space-1); }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-grid .dow { font: var(--type-caption); color: var(--gray-700); text-align: center; padding: var(--space-1) 0; }
-.cal-grid .day { font: var(--type-caption); color: var(--gray-1000); text-align: center; padding: var(--space-1) 0; border-radius: var(--radius-s); cursor: pointer; border: 1px solid transparent; background: transparent; }
-.cal-grid .day:hover { background: var(--gray-100); }
-.cal-grid .day.muted { color: var(--gray-600); }
-.cal-grid .day.today { border-color: var(--gray-500); }
-.cal-grid .day.selected { background: var(--brand); color: var(--brand-ink); }
-.cal-grid .day.in-week { background: var(--brand-soft); color: var(--brand-text); border-radius: 0; }
-.cal-grid .day.in-week.first { border-radius: var(--radius-s) 0 0 var(--radius-s); }
-.cal-grid .day.in-week.last { border-radius: 0 var(--radius-s) var(--radius-s) 0; }
-.cal-grid .day.in-week.selected { background: var(--brand); color: var(--brand-ink); border-radius: var(--radius-s); }
+   read as dead space in week mode (dogfood r1B item 11). The grid is the
+   shadcn calendar (react-day-picker, ui/calendar.tsx — D31); these rules
+   style its table to the ruled grammar. */
+.cal { position: relative; width: 15rem; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-4); }
+.cal .cal-caption { display: flex; align-items: center; min-height: 1.875rem; margin-bottom: var(--space-1); }
+.cal .month { font: var(--type-label); color: var(--gray-1000); }
+.cal .cal-nav { position: absolute; top: var(--space-4); right: var(--space-4); display: flex; gap: var(--space-1); }
+.cal .cal-table { width: 100%; border-collapse: separate; border-spacing: 2px; }
+.cal .dow { font: var(--type-caption); font-weight: 400; color: var(--gray-700); text-align: center; padding: var(--space-1) 0; }
+.cal .cal-day { padding: 0; text-align: center; }
+.cal .day { width: 100%; font: var(--type-caption); color: var(--gray-1000); text-align: center; padding: var(--space-1) 0; border-radius: var(--radius-s); cursor: pointer; border: 1px solid transparent; background: transparent; }
+.cal .day:hover { background: var(--gray-100); }
+.cal .cal-day.muted .day { color: var(--gray-600); }
+.cal .cal-today .day { border-color: var(--gray-500); }
+.cal .cal-day.selected .day { background: var(--brand); color: var(--brand-ink); }
+.cal .cal-day.in-week { background: var(--brand-soft); }
+.cal .cal-day.in-week .day { color: var(--brand-text); border-radius: 0; }
+.cal .cal-day.in-week.first { border-radius: var(--radius-s) 0 0 var(--radius-s); }
+.cal .cal-day.in-week.last { border-radius: 0 var(--radius-s) var(--radius-s) 0; }
+.cal .cal-day.anchor .day { background: var(--brand); color: var(--brand-ink); border-radius: var(--radius-s); }
 .cal-foot { border-top: 1px solid var(--gray-200); margin-top: var(--space-2); padding-top: var(--space-2); font: var(--type-caption); color: var(--gray-800); text-align: center; }
 
 /* ============ board ============ */
