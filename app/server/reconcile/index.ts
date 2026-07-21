@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { toDay } from "../../src/lib/dates";
 import type { ReconRun, Verdict } from "../../src/lib/types";
 import type { Store } from "../store/db";
 
@@ -9,10 +10,10 @@ import type { Store } from "../store/db";
    never auto-redated (R7 deferred, 2026-07-15). */
 
 /* task dates are local YYYY-MM-DD; timestamps are ISO — compare in the
-   operator's local time, where the sidecar runs */
+   operator's local time, where the sidecar runs. Formatting is
+   single-homed in src/lib/dates (D31 review). */
 export function localDay(iso: string): string {
-  const d = new Date(iso);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  return toDay(new Date(iso));
 }
 
 export async function runRecon(store: Store, day: string): Promise<ReconRun> {

@@ -62,7 +62,15 @@ export function registerRoutes(app: FastifyInstance, store: Store, source: Sessi
      sessions resume in a terminal (r1B.2), html/links in the browser,
      images in the OS viewer, everything else in the editor. The map is
      the one home for the rule — nothing here decides per-surface. */
-  app.post<{ Body: { path?: string; sessionId?: string; kind?: string; sha?: string } }>("/api/open", async (req) => {
+  app.post<{ Body: { path?: string; sessionId?: string; kind?: string; sha?: string } }>("/api/open", async (req, reply) => {
+    /* the preview route's evidence gate, applied to spawns (D31 review):
+       a path only opens if the evidence log references it — the client
+       never sends anything else (href artifacts open client-side), so
+       anything failing the gate is not Trail talking. */
+    if (req.body.path && !store.hasEvidenceFile(req.body.path)) {
+      reply.code(403);
+      return { error: "not an evidence file" };
+    }
     const { spawn } = await import("node:child_process");
     const detached = { detached: true, stdio: "ignore" as const };
     /* a missing wt / code shim must not take the sidecar down */

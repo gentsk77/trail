@@ -519,9 +519,11 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
                       type="button"
                       className="menu-item"
                       style={indent ? { paddingLeft: "calc(var(--space-3) + var(--space-4))" } : undefined}
+                      title={objective.title}
                       onClick={() => { setOpenMenu(null); applyPatch({ objectiveId: objective.id }); }}
                     >
-                      {objective.title}
+                      {/* the ruled 28ch cap + hover reveal, as in every sibling menu (review V3) */}
+                      <span className="obj-lbl">{objective.title}</span>
                     </button>
                   ))}
                   <button type="button" className="menu-item sep-above" onClick={() => { setOpenMenu(null); applyPatch({ objectiveId: undefined }); }}>None</button>

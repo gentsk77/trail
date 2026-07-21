@@ -105,7 +105,8 @@ export function Progress({ state, onOpenTask }: { state: AppState; onOpenTask: (
               if (day > td) {
                 return <button key={day} type="button" className="heat-cell future" tabIndex={-1} aria-hidden="true" />;
               }
-              const label = `${fmtShort(day)} — ${daySummary(p?.done.length ?? 0, p?.ready.length ?? 0)}`;
+              /* colon join: the em dash stays a docs-register mark (voice law) */
+              const label = `${fmtShort(day)}: ${daySummary(p?.done.length ?? 0, p?.ready.length ?? 0)}`;
               const cls = ["heat-cell", heatClass(count), day === selected ? "selected" : ""].filter(Boolean).join(" ");
               return (
                 <button

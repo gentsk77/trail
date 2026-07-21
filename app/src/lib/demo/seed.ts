@@ -1,3 +1,4 @@
+import { toDay } from "../dates";
 import type {
   ActivityEvent, EvidenceEvent, Objective, Project, ReconRun, SessionRecord, Task
 } from "../types";
@@ -40,9 +41,7 @@ function rng(n: number): number {
   return ((n ^ (n >>> 14)) >>> 0) / 4294967296;
 }
 
-function toDay(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+/* date formatting is single-homed in ../dates (D31 review) */
 
 /* History pools, project-flavored: the lab reads as the research program
    the product came from; the pilot reads as rollout execution. */
