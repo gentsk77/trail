@@ -1,0 +1,89 @@
+/* ============================================================
+   TAILWIND + SHADCN BRIDGE (D31). Tailwind exists because the
+   shadcn/ui primitive layer requires it; the Trail tokens in
+   tokens.css stay the source of truth and every shadcn semantic
+   variable maps onto them. Preflight is deliberately skipped:
+   base.css owns the reset, and importing Tailwind's would
+   reflow the bespoke surfaces (board, tree, heat grid).
+   ============================================================ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Tailwind's dark: variant keys off the existing data-theme
+   attribute (main.tsx sets it); no .dark class ships. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* shadcn semantic variables <- Trail tokens. These flip with the
+   theme automatically because the Trail tokens they reference
+   flip under [data-theme="dark"]; no dark block is needed here.
+   "Destructive" maps to the ordinary primary pair: color
+   rationing rules out a destructive hue (D28). */
+:root {
+  --background: var(--background-1);
+  --foreground: var(--gray-1000);
+  --card: var(--background-2);
+  --card-foreground: var(--gray-1000);
+  --popover: var(--background-2);
+  --popover-foreground: var(--gray-1000);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-ink);
+  --secondary: var(--gray-100);
+  --secondary-foreground: var(--gray-1000);
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-700);
+  --accent: var(--gray-100);
+  --accent-foreground: var(--gray-1000);
+  --destructive: var(--brand);
+  --destructive-foreground: var(--brand-ink);
+  --border: var(--gray-400);
+  --input: var(--gray-400);
+  --ring: var(--brand);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* the two ruled radii plus the pill; no derived calc scale */
+  --radius-sm: var(--radius-s);
+  --radius-md: var(--radius-s);
+  --radius-lg: var(--radius-m);
+  --radius-xl: var(--radius-m);
+
+  /* elevation stays the two ruled recipes */
+  --shadow-raised: var(--shadow-raised);
+  --shadow-float: var(--shadow-float);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+/* base.css owns the reset; this is the one preflight rule the
+   Tailwind border utilities depend on. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-width: 0;
+    border-style: solid;
+    border-color: var(--border);
+  }
+}

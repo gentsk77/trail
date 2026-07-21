@@ -5,6 +5,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto-mono/400.css";
 import "@fontsource/roboto-serif/400.css";
 import "./styles/tokens.css";
+import "./styles/tw.css";
 import "./styles/base.css";
 import { App } from "./App";
 
