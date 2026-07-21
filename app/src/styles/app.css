@@ -369,7 +369,6 @@
 /* whole header = the disclosure target (r4/r5, ARIA disclosure pattern);
    interactive children except themselves */
 .ib-head { display: flex; align-items: center; gap: var(--space-2); min-width: 0; cursor: pointer; }
-.ib-head .cbx:not(.checked) .icon { visibility: hidden; }
 .ib-head .title { font: var(--type-body); color: var(--gray-1000); text-align: left; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ib-head .arts { font: var(--type-data); color: var(--gray-700); white-space: nowrap; }
 .ib-open { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-1); background: transparent; border: 0; padding: 0; font: var(--type-caption); color: var(--gray-800); cursor: pointer; white-space: nowrap; transition: color var(--duration-state) var(--ease); }
@@ -580,7 +579,7 @@ textarea.input { resize: vertical; min-height: 5.5rem; line-height: 1.6; }
    Vendor tile colors are identity, not meaning-hues. */
 .app-tile { width: 20px; height: 20px; flex: none; border-radius: var(--radius-s); display: inline-flex; align-items: center; justify-content: center; }
 .app-tile .icon { width: 12px; height: 12px; }
-.app-tile.claude { background: var(--brand-claude); color: #fff; }
+.app-tile.claude { background: var(--brand-claude); color: var(--brand-ink); }
 /* the official Codex mark is its own tile (dogfood r4): no added border or
    fill — the mark's white plate + gradient glyph render full-size, corners
    clipped to the shared tile radius so it sits square with the Claude tile */

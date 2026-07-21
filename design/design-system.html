@@ -764,7 +764,11 @@
     section in place rather than adding a duplicate. Every demo must render correctly in both
     themes (the toggle above), and conformance against this sheet means computed styles and
     interaction, not vibes. Components reference tokens only; if a value is not a token, it
-    does not ship.
+    does not ship. The primitive layer is <strong>shadcn/ui</strong> (D31): overlays, form
+    controls, badges, and the calendar are the library's components themed by these tokens,
+    and component sections reference the themed components rather than re-draw them; where a
+    library default disagrees with a ruled law, the sheet wins and the component is restyled.
+    beUI (the vetted motion layer) is skipped while the Motion law rations motion to liveness.
   </p>
 </section>
 
@@ -947,7 +951,10 @@
   <p class="annotation">
     Nothing animates by default; motion exists to clarify a change, never to decorate. When it
     earns its place: one easing, three durations (150ms state changes, 200ms reveals, 300ms
-    overlays), and reduced-motion preferences are always honored. Motion is Trail's liveness
+    overlays), and reduced-motion preferences are always honored. Entrances joined the ruled
+    set at D31: menus and popovers reveal on <code>--duration-reveal</code>, modals enter on
+    <code>--duration-overlay</code>, both on the one easing; the demo toast still appears and
+    leaves plainly (its own law stands). Motion is Trail's liveness
     signal: the continuous animations in the product are the Running indicator's breathing
     dot (<code>--duration-live</code>, one calm 2s breath) — a task moving without the
     operator's hand — and, on the same breath, <strong>skeleton placeholders</strong> while
@@ -1065,11 +1072,14 @@
   <h2 class="sec-title">Popovers</h2>
   <p class="annotation">
     One primitive owns every float panel — menus, pickers, the calendar (converged 2026-07-15,
-    dogfood r1B; <code>Popover.tsx</code> in the build). The panel portals to the document body
-    and positions fixed from its trigger's viewport rect, so opening one never reflows an
+    dogfood r1B; <code>ui/popover.tsx</code>, the shadcn/Radix popover, since D31 — the
+    one-primitive law outranks shadcn's popover/dropdown-menu taxonomy, so no second menu
+    primitive ships). The panel portals to the document body
+    and positions from its trigger's viewport rect, so opening one never reflows an
     ancestor and never adds a scrollbar to the page or any container. It appears below the
-    trigger, start-aligned, one <code>--space-2</code> gap; when the space below cannot hold it
-    and above has more, it flips above; at a horizontal viewport edge it mirrors its alignment,
+    trigger, start-aligned, one <code>--space-2</code> gap; when it cannot fit below it flips
+    above (Radix collision logic, D31, amending the letter of the old above-has-more rule); at
+    a horizontal viewport edge it mirrors its alignment,
     then clamps. Content past the height cap scrolls inside the panel, never the page. Escape
     dismisses only the top layer — a menu inside a modal closes and leaves the modal open — and
     returns focus to the trigger; an outside pointer-down closes and leaves focus where the
@@ -1104,7 +1114,7 @@
     <li>Height: <code>min(20rem, available space on the chosen side)</code>; longer content scrolls inside the panel — the page never gains scrollbars.</li>
     <li>Dismissal: outside pointer-down and Escape both close; Escape acts on the top layer only and hands focus back to the trigger; an outside click leaves focus where the user clicked.</li>
     <li>An open panel tracks its trigger: position recomputes on any scroll outside the panel, window resize, and panel-content resize. Scrolling <em>inside</em> the panel never re-places it — the trigger hasn't moved, and re-measuring mid-scroll would snap the content back to the top.</li>
-    <li>Layering: the panel floats above the modal layer. The literal z-indexes (50 over the modal's 40) are unruled — a z-scale is an open maintainer question; mint no new z values meanwhile.</li>
+    <li>Layering: the panel floats above the modal layer by portal order (D31 — Radix portals resolve the old z-scale question; the 40/50 literals retired, and no z literal ships).</li>
     <li>Containers never pre-clip for panels: the backlog tree and lists carry no <code>overflow: hidden</code> — corners come from radii on the head and last row — so a clipped ancestor can neither swallow a panel nor collapse under the shell grid (r1B).</li>
   </ul>
 </section>
@@ -1402,7 +1412,7 @@ not ours.</span></span>
     <li>Artifact-less sign-off (D25): when an expanded card's artifact strip is empty, the agent's last message renders in the waiting-card excerpt treatment instead — the claim is the only evidence there is, and the sign-off ratifies exactly that claim. Cards with artifacts stay artifact-first; a card never shows both.</li>
     <li>Waiting excerpt: the agent's last message, three-line clamp, body type — no quote styling (agent-authored content, not app copy). Inline markdown renders instead of showing its syntax (dogfood r2): bold, italic, inline code (mono on a <code>gray-100</code> chip); link/heading/list markers strip to their text — block structure has no home in a three-line clamp.</li>
     <li>Sign off = the manual Ready→Done move on the selection (D11 invariants stand). The Waiting section holds no buttons — Open session is the only affordance, link-style, resuming per the destination map.</li>
-    <li>Thumbnail tile: 9rem, <code>radius-s</code>; preview area 5.25rem on <code>gray-100</code> — a real render of the file's own bytes (images cover the frame; html in an inert sandboxed iframe scaled to fit; text as its opening lines), kind icon for commit/PR/session; footer = mono label, truncated. Hover = brand border (a link affordance, not a state hue, r5) + the open-link glyph in <code>brand-text</code> revealed before the name, space reserved so nothing reflows (r6). No per-artifact checkbox (r2); no on-tile destination hint in v0 (r5). Amends D8's detail-only rule for this surface alone.</li>
+    <li>Thumbnail tile: 9rem, <code>radius-s</code>; preview area 5.25rem on <code>gray-100</code> — a real render of the file's own bytes (images cover the frame; html in an inert sandboxed iframe scaled to fit on a deliberately white canvas in both themes — a document render reads as paper, the one ruled non-token color outside the vendor marks (D31); text as its opening lines), kind icon for commit/PR/session; footer = mono label, truncated. Hover = brand border (a link affordance, not a state hue, r5) + the open-link glyph in <code>brand-text</code> revealed before the name, space reserved so nothing reflows (r6). No per-artifact checkbox (r2); no on-tile destination hint in v0 (r5). Amends D8's detail-only rule for this surface alone.</li>
   </ul>
 </section>
 
@@ -1476,7 +1486,7 @@ not ours.</span></span>
     <li>Toggle: <code>gray-200</code> track (radius-full, 2px pad); thumb = <code>background-2</code>, no shadow, label weight; inactive segments quiet.</li>
     <li>Fixed widths: jump 80px (fits "This week"), picker 156px (fits "Week of May 31", the measured widest label, with ~6px air; 184px read as dead space — ui r1), label centered.</li>
     <li>Panel width 15rem — the longest month label ("September 2026") plus the steppers fit with ~28px day cells; wider read as dead space (r1B).</li>
-    <li>Popover: opens through the popover primitive (Popovers section); radius-m, <code>--shadow-float</code>, 200ms reveal; day cells caption type, hover <code>gray-100</code>; adjacent-month days <code>gray-600</code>; today = <code>gray-500</code> outline; selected day = brand fill; selected week = <code>brand-soft</code> band, rounded at the ends, anchor day brand; the footer restates the selection in words.</li>
+    <li>Popover: opens through the popover primitive (Popovers section); the grid is the shadcn calendar (react-day-picker, <code>ui/calendar.tsx</code>, D31) restyled to this law — one grid serves the control and the task modal's date field; radius-m, <code>--shadow-float</code>, 200ms reveal; day cells caption type, hover <code>gray-100</code>; adjacent-month days <code>gray-600</code>; today = <code>gray-500</code> outline; selected day = brand fill; selected week = <code>brand-soft</code> band, rounded at the ends, anchor day brand; the footer restates the selection in words.</li>
   </ul>
 </section>
 
@@ -1648,7 +1658,9 @@ not ours.</span></span>
     while staying the outside-click close target; the panel keeps <code>--shadow-float</code>. <strong>Placement is dead center</strong> (dogfood r2):
     the wrapper centers the panel horizontally and vertically in the viewport (flex, both
     axes), the panel caps at the padded viewport and keeps its float shadow; the wrapper
-    carries <code>role="dialog" aria-modal="true"</code>. The objective variant rides the same anatomy (dogfood r3): parent crumb ("No parent
+    carries <code>role="dialog" aria-modal="true"</code> and, since D31, rides the shadcn/Radix
+    dialog (<code>ui/dialog.tsx</code>): the focus trap and focus restore the D19 cut deferred
+    now ship, and Esc layering is the primitive's own. The objective variant rides the same anatomy (dogfood r3): parent crumb ("No parent
     objective" when top-level), editable title, the rollup as its <code>.dm-sub</code>,
     description then the objective's task rows in the main column, and a side rail of links —
     parent objective and child objectives (links, not pickers: restructuring the tree is not
@@ -2074,7 +2086,7 @@ not ours.</span></span>
   <ul class="spec">
     <li>One mechanism per moment: the banner is the always-visible mark, its dialog is the documentation, inline captions warn before a simulated flow, the toast answers a click whose destination is local. No surface repeats another's copy.</li>
     <li>Toast copy grammar: "In the local app, this …" — destination named from the artifact-destinations map (terminal / editor / image viewer), one string per destination, no apology and no exclamation. The folderless dispatch refusal reuses the live sidecar's message verbatim ("Set a project with a directory, then dispatch") — one fact, one home.</li>
-    <li>Layering: the toast and the dialog share the popover layer (z 50). No new z-index literal ships while the two-token scale question stays open. The banner owns the sidebar's bottom push (margin-top auto); the footer stops double-claiming it via the adjacent-sibling rule.</li>
+    <li>Layering: the toast (Sonner since D31, one visible toast, bottom-center, motion killed) and the dialog float above the modal layer; layering rides portal order and the toast library's own list — the z-scale question closed at D31 with no app z literal. The banner owns the sidebar's bottom push (margin-top auto); the footer stops double-claiming it via the adjacent-sibling rule.</li>
     <li>Copy inventory (the full ruled set, em-dash- and semicolon-free per the Voice law): banner "Demo data"; dialog title "Everything here is fictional" + the body paragraph + "Got it" as demoed; connect step 1 "A simulated scan over demo data. Nothing on your machine is read. Connecting real agents needs the local app."; step 2 "A simulated import over demo data. These sessions are fictional."; context pack "The pack below is what a live dispatch sends. The status stream that follows is a replay. In the local app, dispatch opens a terminal."; menu row "Reset demo data".</li>
   </ul>
 </section>
