@@ -17,13 +17,13 @@ export interface DemoData {
   activity: ActivityEvent[];
   evidence: EvidenceEvent[];
   /* tile previews, keyed by file-ref path: real renders of the seed's
-     own file contents (D17 — never a fake preview) */
+     own file contents (D17: never a fake preview) */
   previews: Record<string, { kind: "image" | "html" | "text"; content: string }>;
 }
 
 /* Three projects (§6.2): the research-lab analogue carries ~2 weeks of
    imported session history; the pilot repo holds the demo-day hero
-   shapes; ops is folderless — the "No folder" chip and the no-dir
+   shapes; ops is folderless: the "No folder" chip and the no-dir
    dispatch refusal both need it. */
 const DIRS = {
   lab: "~/repos/agent-workflow-lab",
@@ -84,7 +84,7 @@ export function buildDemoData(today = new Date()): DemoData {
     return d.toISOString();
   };
 
-  /* two L1s, four L2s — §4.2's tree in fictional analogue */
+  /* two L1s, four L2s: §4.2's tree in fictional analogue */
   const objectives: Objective[] = [
     { id: "o-pilot", level: 1, title: "Ship the summarizer pilot to the teams", state: "planned", createdAt: iso(-24, 9) },
     { id: "o-wave2", level: 2, parentId: "o-pilot", title: "Run the wave-2 pilot cohort", state: "planned", createdAt: iso(-21, 9) },
@@ -151,12 +151,12 @@ export function buildDemoData(today = new Date()): DemoData {
 
   /* ---- today's board: every column inhabited at first load ---- */
 
-  /* planned — dispatch fodder; the ops one exercises the no-dir refusal */
+  /* planned: dispatch fodder; the ops one exercises the no-dir refusal */
   addTask({ title: "Book wave-3 team interviews", description: "Five interview slots across the teams that skipped wave 2; aim for two skeptics.", objectiveId: "o-wave2", projectId: P.pilot, date: day(0), createdAt: iso(-1, 18, 20) });
   addTask({ title: "Draft the rollout comms note", objectiveId: "o-readout", projectId: P.ops, date: day(0), createdAt: iso(-1, 18, 22) });
   addTask({ title: "Triage the week's pilot bug reports", objectiveId: "o-wave2", projectId: P.pilot, date: day(0), createdAt: iso(0, 8, 15) });
 
-  /* running — two live sessions, the parallel-attention story */
+  /* running: two live sessions, the parallel-attention story */
   const harness = addTask({
     title: "Wire the eval harness to the transcript sampler",
     description: "Harness pulls scored samples straight from the sampler output; no hand-copied fixtures.",
@@ -175,7 +175,7 @@ export function buildDemoData(today = new Date()): DemoData {
   addActivity({ taskId: catalog.id, kind: "status", from: "planned", to: "running", by: "automation", at: iso(0, 10, 41) });
   catalog.statusAt = iso(0, 10, 41);
 
-  /* waiting — the terminal-native hero (no dispatch event: the watcher
+  /* waiting: the terminal-native hero (no dispatch event: the watcher
      found it) plus a second card so the queue reads as a queue */
   const redact = addTask({
     title: "Prototype the transcript-redaction pre-processor",
@@ -194,7 +194,7 @@ export function buildDemoData(today = new Date()): DemoData {
   addActivity({ taskId: faq.id, kind: "status", from: "running", to: "waiting", by: "automation", note: "agent asked a question", at: iso(0, 15, 12) });
   faq.statusAt = iso(0, 15, 12);
 
-  /* ready — the sign-off queue: three heroes, statusAt distinct so the
+  /* ready: the sign-off queue: three heroes, statusAt distinct so the
      oldest-first order is visibly correct (D17) */
   const themes = addTask({
     title: "Synthesize wave-2 pilot feedback into themes",
@@ -227,7 +227,7 @@ export function buildDemoData(today = new Date()): DemoData {
   addActivity({ taskId: sampler.id, kind: "status", from: "running", to: "ready", by: "automation", note: "session closed claiming done", at: iso(0, 13, 15) });
   sampler.statusAt = iso(0, 13, 15);
 
-  /* done hero — the full lifecycle timeline, operator/automation mix,
+  /* done hero: the full lifecycle timeline, operator/automation mix,
      only the final move by a human hand (D8/D11) */
   const policy = addTask({
     title: "Draft the redaction policy one-pager",
@@ -265,7 +265,7 @@ export function buildDemoData(today = new Date()): DemoData {
     /* the Inbox waiting card's body: the agent's real question, near the
        500-char harvest clamp, carrying inline markdown (D19.6) */
     lastAgentMessage:
-      "Scope check before I write code: the wave-2 transcripts in `fixtures/wave2/` carry four identifier kinds — team names, engineer handles, ticket IDs, and file paths. I can mask **all four** behind stable placeholders, or keep ticket IDs so reviewers can cross-reference the tracker. Masking everything is safer but breaks the audit trail; keeping IDs leaks codenames into the shared eval set. Which trade should I take? I'll wire the pass into `pipeline/redact.ts` either way."
+      "Scope check before I write code: the wave-2 transcripts in `fixtures/wave2/` carry four identifier kinds: team names, engineer handles, ticket IDs, and file paths. I can mask **all four** behind stable placeholders, or keep ticket IDs so reviewers can cross-reference the tracker. Masking everything is safer but breaks the audit trail; keeping IDs leaks codenames into the shared eval set. Which trade should I take? I'll wire the pass into `pipeline/redact.ts` either way."
   });
   redact.linkedSessionIds.push("s-redact");
 
@@ -273,7 +273,7 @@ export function buildDemoData(today = new Date()): DemoData {
     id: "s-faq", projectDir: DIRS.pilot, startedAt: iso(0, 13, 30), lastActiveAt: iso(0, 15, 12),
     taskId: faq.id, title: "Refresh the pilot FAQ", liveStatus: "waiting",
     lastAgentMessage:
-      "Week-2 questions sorted — 14 of 31 are variants of **\"can it see our internal wiki?\"** The draft answer says no until the connector ships. Confirm that's still the line and I'll publish the FAQ update."
+      "Week-2 questions sorted. 14 of 31 are variants of **\"can it see our internal wiki?\"** The draft answer says no until the wiki integration ships. Confirm that's still the line and I'll publish the FAQ update."
   });
   faq.linkedSessionIds.push("s-faq");
 
@@ -282,7 +282,7 @@ export function buildDemoData(today = new Date()): DemoData {
   const sThemes = mkSession({
     id: "s-themes", projectDir: DIRS.pilot, startedAt: iso(0, 9, 12), lastActiveAt: iso(0, 9, 38),
     taskId: themes.id, title: "Synthesize wave-2 feedback",
-    lastAgentMessage: "Themes memo drafted: three themes carry 24 of 30 comments — latency on long transcripts, missing tracker links, and \"where did my summary go\" navigation. Full memo in `wave2-themes.md`, quotes attributed by team."
+    lastAgentMessage: "Themes memo drafted: three themes carry 24 of 30 comments: latency on long transcripts, missing tracker links, and \"where did my summary go\" navigation. Full memo in `wave2-themes.md`, quotes attributed by team."
   });
   themes.linkedSessionIds.push(sThemes.id);
   const sAdoption = mkSession({
@@ -300,7 +300,7 @@ export function buildDemoData(today = new Date()): DemoData {
   const sPolicy = mkSession({ id: "s-policy", projectDir: DIRS.pilot, startedAt: iso(-1, 9, 30), lastActiveAt: iso(-1, 15, 22), taskId: policy.id, title: "Redaction policy one-pager" });
   policy.linkedSessionIds.push(sPolicy.id);
 
-  /* the pending link suggestion (D18: task-modal-only home) — an unlinked
+  /* the pending link suggestion (D18: task-modal-only home), an unlinked
      notes session pointing at the themes hero */
   mkSession({
     id: "s-notes", projectDir: DIRS.pilot, startedAt: iso(-1, 14, 0), lastActiveAt: iso(-1, 14, 44),
@@ -310,7 +310,7 @@ export function buildDemoData(today = new Date()): DemoData {
   /* drift: an unlinked session from today, tomorrow's recon will flag it */
   mkSession({ id: "s-drift", projectDir: DIRS.pilot, startedAt: iso(0, 15, 40), lastActiveAt: iso(0, 16, 5), title: "Poking at the sampler flags" });
 
-  /* ---- evidence: full chains behind every hero (D20.4 — commits stay
+  /* ---- evidence: full chains behind every hero (D20.4, commits stay
      timeline rows; only files + PR links reach the artifact strip) ---- */
   const NOTES_PATH = "~/repos/summarizer-pilot/docs/wave2-themes.md";
   const CHART_PATH = "~/repos/summarizer-pilot/readout/adoption-wave2.svg";
@@ -341,7 +341,7 @@ export function buildDemoData(today = new Date()): DemoData {
   ev({ sessionId: sPolicy.id, taskId: policy.id, kind: "outcome-claim", payload: { text: "One-pager and flow diagram drafted; PR open", via: "llm" }, source: { file: sPolicy.file, line: 80 }, at: iso(-1, 15, 22) });
   ev({ sessionId: sPolicy.id, taskId: policy.id, kind: "segment", payload: { label: "Redaction policy one-pager", file: sPolicy.file }, source: { file: sPolicy.file, line: 1 }, at: iso(-1, 15, 22) });
 
-  /* friction + candidate lessons (D6 substrate — stored, no surface yet) */
+  /* friction + candidate lessons (D6 substrate: stored, no surface yet) */
   ev({ sessionId: "s-redact", kind: "friction", payload: { text: "Re-explained the redaction scope in three separate sessions" }, source: { file: "s-redact.jsonl", line: 9 }, at: iso(0, 14, 5) });
   ev({ sessionId: "s-redact", kind: "lesson", payload: { text: "Pin the redaction scope doc into the project context" }, source: { file: "s-redact.jsonl", line: 9 }, at: iso(0, 14, 5) });
   ev({ sessionId: "s-notes", kind: "friction", payload: { text: "Team feedback arrives in four formats; normalizing eats the first hour" }, source: { file: "s-notes.jsonl", line: 14 }, at: iso(-1, 14, 44) });
@@ -352,7 +352,7 @@ export function buildDemoData(today = new Date()): DemoData {
     [NOTES_PATH]: {
       kind: "text",
       content: [
-        "# Wave-2 feedback — themes",
+        "# Wave-2 feedback: themes",
         "",
         "Thirty comments, nine teams. Three themes carry 24 of 30.",
         "",
@@ -374,7 +374,7 @@ export function buildDemoData(today = new Date()): DemoData {
       content:
         "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 180\">" +
         "<rect width=\"320\" height=\"180\" fill=\"#fafafa\"/>" +
-        "<text x=\"16\" y=\"26\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#444\">Weekly active reviewers — wave 2</text>" +
+        "<text x=\"16\" y=\"26\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#444\">Weekly active reviewers, wave 2</text>" +
         "<g fill=\"#b9c2d0\">" +
         "<rect x=\"28\" y=\"128\" width=\"32\" height=\"22\"/>" +
         "<rect x=\"76\" y=\"108\" width=\"32\" height=\"42\"/>" +
@@ -391,7 +391,7 @@ export function buildDemoData(today = new Date()): DemoData {
     [POLICY_PATH]: {
       kind: "text",
       content: [
-        "# Redaction policy — one page",
+        "# Redaction policy: one page",
         "",
         "The pre-processor strips before anything enters the shared",
         "eval set. Default: mask; exceptions are signed, not assumed.",
@@ -416,9 +416,9 @@ export function buildDemoData(today = new Date()): DemoData {
   };
 
   /* ---- the history arc: ~3 weeks (§6.2), the lab's two imported weeks
-     plus pilot execution — all acknowledged Done, so today's Inbox holds
+     plus pilot execution: all acknowledged Done, so today's Inbox holds
      only today's queue ---- */
-  /* each history title appears once across the whole window — repeats
+  /* each history title appears once across the whole window: repeats
      read generated, and the seed must read authored (D21) */
   const used = new Set<string>();
   const draw = (pool: string[], r: number): string | undefined => {
@@ -452,7 +452,7 @@ export function buildDemoData(today = new Date()): DemoData {
     if (offset === -1) count = 3;
     for (let i = 0; i < count; i++) {
       const pick = historyPick(offset, i);
-      if (!pick) continue; /* pools drained — better thin days than repeats */
+      if (!pick) continue; /* pools drained: better thin days than repeats */
       used.add(pick.title);
       const task = addTask(
         { ...pick, date: toDay(d), createdAt: iso(offset, 9) },
