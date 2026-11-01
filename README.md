@@ -1,44 +1,46 @@
-# Trail
+Trail is a task tracker that reads my Claude Code sessions, moves planned tasks forward on the commits, files and PRs those sessions contain, and asks me to sign off on what agents claim they finished.
 
-Trail is an agent-native personal task tracker. Instead of asking you to log what you did, it reconciles your stated intent against the evidence your tools already record — agent session transcripts, git history, calendar.
+![Task window with the activity timeline Trail wrote on its own](docs/task-modal.png)
 
-## Why
-
-When execution moves into AI agent sessions, two things break. **Closure**: at the end of the day, "what did I actually get done?" is unanswerable from memory, because the evidence lives in transcripts, commits, and PR threads you never typed. And every mainstream tracker compounds the problem by assuming the human is the write path for status — double-entry bookkeeping against work that is already fully recorded elsewhere, which is why personal trackers rot within days of adoption. The truth already exists in the substrate; Trail reads it.
-
-The full argument, with research citations, is in [thesis.md](thesis.md).
-
-## How it works
-
-- **Intent** — a small tree of standing objectives, with concrete dated tasks linked to the objectives they serve. "Today" and "this week" are views over that structure, not separate data levels.
-- **Evidence** — read-only ingest of the substrate: agent session stores and git across watched repos. Trail observes; it never mutates.
-- **Reconciliation** — at day and week boundaries the plan is diffed against the evidence. Evidence moves tasks forward automatically; only the operator's own move sets Done, so Done is never a claim.
-- **Dispatch** — any task can be handed to an agent as a pre-contexted session: the task, its objective chain, and the lessons accumulated from its family travel with it.
-
-## Running it
+## Try it in 30 seconds
 
 ```sh
 cd app
 npm install
-npm run dev        # web + API against the live local substrate
-npm run demo       # seeded demo mode, no local data needed
+npm run demo
+```
+
+The demo runs on a seeded, fictional story, so no local data is needed. Click a task in the Dashboard's Ready column to see the timeline above, then open the Inbox to see what the agents claim they finished.
+
+## What it reads and what it does
+
+- **Intent:** a small tree of standing objectives, with dated tasks linked to the objectives they serve. "Today" and "this week" are views over that tree, not separate lists.
+- **Evidence:** read-only ingest of the Claude Code session store (`~/.claude/projects`), including the commits, edited files and PR links inside each transcript. Trail observes; it never writes to the sessions.
+- **Reconciliation:** evidence moves tasks forward on its own (Planned to Running to Ready). Only my own move sets Done, so Done is never an agent's claim: claimed completions wait in the Inbox for sign-off.
+- **Dispatch:** any task can be handed to a new Claude Code session in Windows Terminal, opened in the task's project folder with the task and its objective chain as the first prompt.
+
+Next: reading git history directly from watched repos, so commits made outside an agent session count too.
+
+## Requirements
+
+- Demo mode runs anywhere Node runs.
+- Node 22 or newer.
+- Live mode (`npm run dev`) needs Claude Code installed and reads your local sessions.
+- Dispatch and open (opening a task's files or folder from Trail) are Windows only: they use Windows Terminal, `cmd` and PowerShell.
+
+## Development
+
+```sh
+cd app
+npm run dev        # web + API against your local Claude Code sessions
 npm test           # vitest suite
 npm run typecheck
 ```
 
-## Design system
+## Why
 
-[design/design-system.html](design/design-system.html) is the source of truth for visual law — open it in a browser. [design/design.md](design/design.md) is generated from it for agent consumption and is never hand-edited:
+When execution moves into AI agent sessions, the answer to "what did I actually get done today?" stops living in my head. It lives in transcripts, commits and PR threads I never typed. Every mainstream tracker still assumes the human is the write path for status, which means logging by hand work that is already recorded elsewhere, and that is why personal trackers go stale within days. Trail reads the record instead. The full argument, with research citations, is in [thesis.md](thesis.md).
 
-```sh
-python scripts/generate_design_md.py          # regenerate after editing the sheet
-python scripts/generate_design_md.py --check  # exit 1 if design.md is stale
-```
+## License
 
-## Decision record
-
-[docs/decisions.md](docs/decisions.md) is the append-only, D-numbered log of product rulings — status model, view set, visual identity, dogfood batches. Code comments cite these numbers (D8, D24.1, …); the log is where they resolve.
-
-## Status
-
-A working personal prototype, N=1 by design: built by and for a single agent-native operator. Substrate ingest is strictly read-only, and everything Trail writes back toward the substrate (procedure patches, dispatched sessions) is propose-only — the human ratifies.
+MIT, see [LICENSE](LICENSE).
