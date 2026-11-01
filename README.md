@@ -1,3 +1,5 @@
+# Trail
+
 Trail is a task tracker that reads my Claude Code sessions, moves planned tasks forward on the commits, files and PRs those sessions contain, and asks me to sign off on what agents claim they finished.
 
 ![Task window with the activity timeline Trail wrote on its own](docs/task-modal.png)
