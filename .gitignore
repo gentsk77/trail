@@ -2,5 +2,8 @@
 .playwright-mcp/
 shots/
 
-# sandbox copies of live personal data — never committed
+# sandbox copies of live personal data, never committed
 dogfood-data/
+
+# local agent harness config
+.claude/

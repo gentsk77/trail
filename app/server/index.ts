@@ -10,7 +10,7 @@ import { claudeExtractor } from "./harvester/llm";
 import { startLiveWatch } from "./live";
 import { startReconTimer } from "./reconcile";
 import { Store } from "./store/db";
-import { registerRoutes } from "./routes";
+import { LOCAL_ORIGINS, registerRoutes } from "./routes";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = process.env.TRAIL_DATA ?? path.join(here, "..", "data");
@@ -20,7 +20,7 @@ const app = Fastify({ logger: { level: "warn" } });
    localhost-bound and unauthenticated, so a reflected wildcard would let
    any page the operator visits drive state-changing routes. Dev traffic
    normally rides the Vite proxy (same-origin); this covers direct hits. */
-await app.register(cors, { origin: [/^https?:\/\/localhost(:\d+)?$/, /^https?:\/\/127\.0\.0\.1(:\d+)?$/] });
+await app.register(cors, { origin: LOCAL_ORIGINS });
 
 const store = new Store(dataDir);
 await store.load();

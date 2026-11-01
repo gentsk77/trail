@@ -1,3 +1,4 @@
+import type { OutgoingHttpHeaders } from "node:http";
 import type { FastifyInstance } from "fastify";
 import { commitUrl, destinationFor } from "../src/lib/destinations";
 import { composeInbox } from "../src/lib/inbox";
@@ -10,6 +11,10 @@ import type { Store } from "./store/db";
 
 /* REST + SSE surface. The client's HttpClient mirrors these routes; the
    demo client implements the same interface over the bundled seed (D2). */
+
+/* the only browser origins the sidecar answers: Trail's own pages on
+   localhost. Shared by the CORS plugin and the SSE stream. */
+export const LOCAL_ORIGINS = [/^https?:\/\/localhost(:\d+)?$/, /^https?:\/\/127\.0\.0\.1(:\d+)?$/];
 
 export function registerRoutes(app: FastifyInstance, store: Store, source: SessionSource, dispatcher: Dispatcher) {
   app.get("/api/health", async () => ({ ok: true }));
@@ -275,11 +280,19 @@ export function registerRoutes(app: FastifyInstance, store: Store, source: Sessi
   /* ---- live updates ---- */
 
   app.get("/api/events", (req, reply) => {
+    /* writeHead bypasses Fastify's header pipeline, so carry over what
+       the CORS plugin already decided for this request instead of
+       granting every origin: the stream carries live task and session
+       changes. */
+    const decided: OutgoingHttpHeaders = {};
+    for (const [name, value] of Object.entries(reply.getHeaders())) {
+      if (value !== undefined) decided[name] = value;
+    }
     reply.raw.writeHead(200, {
+      ...decided,
       "content-type": "text/event-stream",
       "cache-control": "no-cache",
-      connection: "keep-alive",
-      "access-control-allow-origin": "*"
+      connection: "keep-alive"
     });
     reply.raw.write("retry: 2000\n\n");
     const onChange = (event: unknown) => {
