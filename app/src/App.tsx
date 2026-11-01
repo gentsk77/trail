@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { ConnectModal } from "./components/ConnectModal";
 import { CreateObjectiveModal, CreateTaskModal } from "./components/CreateModal";
-import { DemoNotice } from "./components/DemoNotice";
 import { IconDefs } from "./components/Icons";
 import { ObjectiveModal } from "./components/ObjectiveModal";
 import { ProjectModal } from "./components/ProjectModal";
 import { Sidebar, type ViewName } from "./components/Sidebar";
 import { TaskModal } from "./components/TaskModal";
+import { Toaster, demoToast } from "./components/ui/sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { onDemoNotice } from "./lib/demo/notice";
 import { HttpClient } from "./lib/api";
 import { AppState } from "./lib/appState";
 import { DemoClient } from "./lib/demo/DemoClient";
@@ -38,12 +40,18 @@ export function App() {
 
   useEffect(() => state.start(), [state]);
 
+  /* the demo-notice toast (story 12): demo mode only, never live */
+  useEffect(
+    () => (state.client.mode === "demo" ? onDemoNotice(demoToast) : undefined),
+    [state]
+  );
+
   const openTask = (id: string) => setModal({ kind: "task", id });
   const openObjective = (id: string) => setModal({ kind: "objective", id });
   const close = () => setModal(null);
 
   return (
-    <>
+    <TooltipProvider>
       <IconDefs />
       <div className="shell">
         <Sidebar state={state} view={view} onNavigate={setView} onOpenConnect={() => setModal({ kind: "connect" })} />
@@ -86,8 +94,7 @@ export function App() {
       {modal?.kind === "connect" && (
         <ConnectModal state={state} onClose={close} />
       )}
-      {/* the demo-notice toast (story 12): demo mode only, never live */}
-      {state.client.mode === "demo" && <DemoNotice />}
-    </>
+      {state.client.mode === "demo" && <Toaster />}
+    </TooltipProvider>
   );
 }

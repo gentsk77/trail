@@ -16,7 +16,11 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = process.env.TRAIL_DATA ?? path.join(here, "..", "data");
 
 const app = Fastify({ logger: { level: "warn" } });
-await app.register(cors, { origin: true });
+/* CORS pinned to local dev origins (D31 review): the sidecar is
+   localhost-bound and unauthenticated, so a reflected wildcard would let
+   any page the operator visits drive state-changing routes. Dev traffic
+   normally rides the Vite proxy (same-origin); this covers direct hits. */
+await app.register(cors, { origin: [/^https?:\/\/localhost(:\d+)?$/, /^https?:\/\/127\.0\.0\.1(:\d+)?$/] });
 
 const store = new Store(dataDir);
 await store.load();

@@ -7,11 +7,13 @@ import { STATUSES, STATUS_LABEL } from "../lib/status";
 import type { Objective, Status } from "../lib/types";
 import { artifactIcon } from "./ArtifactTile";
 import { Icon, type IconName } from "./Icons";
-import { ModalWrap } from "./Modal";
-import { Popover } from "./Popover";
+import { ModalWrap } from "./ui/dialog";
+import { Popover } from "./ui/popover";
 import { ProjectPill, projectName } from "./ProjectPill";
 import { StatusBadge } from "./StatusBadge";
-import { CalendarPopoverField } from "./CalendarField";
+import { Calendar } from "./ui/calendar";
+import { Button } from "./ui/button";
+import { Skeleton } from "./ui/skeleton";
 
 /* Task detail (GitHub-issues split): main column tells the story, the side
    rail holds the fields; artifacts live here and nowhere else (D8). Every
@@ -176,35 +178,35 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
      detail lands */
   if (!task) {
     return (
-      <ModalWrap onClose={onClose}>
+      <ModalWrap label="Task detail" onClose={onClose}>
         <div className="dm" style={{ minHeight: "28rem" }} aria-busy="true">
           <div className="dm-head">
-            <span className="crumbs"><span className="skel skel-text" style={{ width: "9rem" }} /></span>
+            <span className="crumbs"><Skeleton text style={{ width: "9rem" }} /></span>
             <h4 className="dm-title">
-              <span className="skel skel-text" style={{ width: "55%", height: "1.05em" }} />
-              <button type="button" className="btn btn-quiet btn-icon dm-close" aria-label="Close" onClick={onClose}>
+              <Skeleton text style={{ width: "55%", height: "1.05em" }} />
+              <Button className="dm-close" variant="quiet" size="icon" aria-label="Close" onClick={onClose}>
                 <Icon name="x" />
-              </button>
+              </Button>
             </h4>
           </div>
           <div className="dm-body dm-body-fixed">
             <div className="dm-main">
               <div className="sec-head"><span className="lbl">Description</span></div>
-              <span className="skel skel-text" style={{ width: "80%" }} />
-              <span className="skel skel-text" style={{ width: "60%" }} />
+              <Skeleton text style={{ width: "80%" }} />
+              <Skeleton text style={{ width: "60%" }} />
             </div>
             <div className="dm-side">
               {["Status", "Objective", "Project", "Date"].map((lbl) => (
                 <div className="field" key={lbl}>
                   <span className="lbl">{lbl}</span>
-                  <span className="skel skel-text" style={{ width: "70%" }} />
+                  <Skeleton text style={{ width: "70%" }} />
                 </div>
               ))}
             </div>
           </div>
           <div className="dm-foot">
-            <button type="button" className="btn btn-quiet" onClick={onClose}>Close</button>
-            <button type="button" className="btn btn-primary" disabled>Save</button>
+            <Button variant="quiet" onClick={onClose}>Close</Button>
+            <Button variant="primary" disabled>Save</Button>
           </div>
         </div>
       </ModalWrap>
@@ -362,7 +364,7 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
   timeline.sort((a, b) => a.at.localeCompare(b.at));
 
   return (
-    <ModalWrap onClose={onClose}>
+    <ModalWrap label={isCreate ? "New task" : "Task detail"} onClose={onClose}>
       <div className="dm">
         <div className="dm-head">
           {isCreate ? (
@@ -414,9 +416,9 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
               /* dispatch acts on the persisted task; staged edits (a
                  just-picked project) haven't saved yet, so the button
                  waits for Save — else it dispatches yesterday's project */
-              <button
-                type="button"
-                className="btn btn-secondary btn-small dm-act-btn"
+              <Button
+               
+                className="dm-act-btn" variant="secondary" size="small"
                 disabled={busy || dirtyFields.length > 0 || !dispatchDir}
                 title={
                   dirtyFields.length > 0
@@ -433,11 +435,11 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
                 }
               >
                 <Icon name="dispatch" />Dispatch
-              </button>
+              </Button>
             )}
-            <button type="button" className="btn btn-quiet btn-icon dm-close" aria-label="Close" onClick={onClose}>
+            <Button className="dm-close" variant="quiet" size="icon" aria-label="Close" onClick={onClose}>
               <Icon name="x" />
-            </button>
+            </Button>
           </h4>
         </div>
         {/* view: the body is fixed — the Activity timeline and the side rail
@@ -517,9 +519,11 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
                       type="button"
                       className="menu-item"
                       style={indent ? { paddingLeft: "calc(var(--space-3) + var(--space-4))" } : undefined}
+                      title={objective.title}
                       onClick={() => { setOpenMenu(null); applyPatch({ objectiveId: objective.id }); }}
                     >
-                      {objective.title}
+                      {/* the ruled 28ch cap + hover reveal, as in every sibling menu (review V3) */}
+                      <span className="obj-lbl">{objective.title}</span>
                     </button>
                   ))}
                   <button type="button" className="menu-item sep-above" onClick={() => { setOpenMenu(null); applyPatch({ objectiveId: undefined }); }}>None</button>
@@ -555,7 +559,7 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
               </button>
               {openMenu === "date" && (
                 <Popover anchorRef={dateRef} onClose={() => setOpenMenu(null)}>
-                  <CalendarPopoverField anchor={task.date} onPick={(d) => { setOpenMenu(null); applyPatch({ date: d }); }} />
+                  <Calendar anchor={task.date} onPick={(d) => { setOpenMenu(null); applyPatch({ date: d }); }} />
                 </Popover>
               )}
             </div>
@@ -569,12 +573,12 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
                     </span>
                     <span className="meta">{fmtTs(session.startedAt)} · {confidence.toFixed(2)}</span>
                     <span className="acts">
-                      <button type="button" className="btn btn-secondary btn-small" onClick={() => void resolveSuggestion(session.id, true)}>
+                      <Button variant="secondary" size="small" onClick={() => void resolveSuggestion(session.id, true)}>
                         Confirm link
-                      </button>
-                      <button type="button" className="btn btn-quiet btn-small" onClick={() => void resolveSuggestion(session.id, false)}>
+                      </Button>
+                      <Button variant="quiet" size="small" onClick={() => void resolveSuggestion(session.id, false)}>
                         Dismiss
-                      </button>
+                      </Button>
                     </span>
                   </div>
                 ))}
@@ -623,26 +627,28 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
         <div className="dm-foot">
           {isCreate ? (
             <>
-              <button type="button" className="btn btn-quiet" onClick={onClose}>Cancel</button>
-              <button type="button" className="btn btn-primary" disabled={busy || !pendingTitle} onClick={() => void create()}>Create</button>
+              <Button variant="quiet" onClick={onClose}>Cancel</Button>
+              <Button variant="primary" disabled={busy || !pendingTitle} onClick={() => void create()}>Create</Button>
             </>
           ) : (
             <>
-              <button type="button" className="btn btn-quiet" onClick={onClose}>Close</button>
-              <button type="button" className="btn btn-primary" disabled={busy || dirtyFields.length === 0} onClick={() => void save()}>Save</button>
+              <Button variant="quiet" onClick={onClose}>Close</Button>
+              <Button variant="primary" disabled={busy || dirtyFields.length === 0} onClick={() => void save()}>Save</Button>
             </>
           )}
         </div>
       </div>
       {packText && (
-        <div className="dm-wrap" onMouseDown={(e) => { if (e.target === e.currentTarget) setPackText(null); }}>
+        /* nested dialog: Radix layers it above the task modal and scopes
+           Esc to this layer (the hand-rolled wrapper had neither, review V1) */
+        <ModalWrap label="Context pack" onClose={() => setPackText(null)}>
           <div className="dm" style={{ width: "42rem" }}>
             <div className="dm-head">
               <h4 className="dm-title">
                 <span className="title-text">Context pack</span>
-                <button type="button" className="btn btn-quiet btn-icon dm-close" aria-label="Close" onClick={() => setPackText(null)}>
+                <Button className="dm-close" variant="quiet" size="icon" aria-label="Close" onClick={() => setPackText(null)}>
                   <Icon name="x" />
-                </button>
+                </Button>
               </h4>
               {/* demo declaration (story 12): the stream is a replay */}
               {state.client.mode === "demo" && (
@@ -653,10 +659,10 @@ export function TaskModal({ state, taskId, onClose, onOpenObjective, mode = "vie
               <pre style={{ font: "var(--type-data)", color: "var(--gray-900)", whiteSpace: "pre-wrap", margin: 0 }}>{packText}</pre>
             </div>
             <div className="dm-foot">
-              <button type="button" className="btn btn-quiet" onClick={() => setPackText(null)}>Close</button>
+              <Button variant="quiet" onClick={() => setPackText(null)}>Close</Button>
             </div>
           </div>
-        </div>
+        </ModalWrap>
       )}
     </ModalWrap>
   );

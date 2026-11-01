@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../components/Icons";
-import { Popover } from "../components/Popover";
+import { Checkbox, RowCheckbox as Cbx } from "../components/ui/checkbox";
+import { Popover } from "../components/ui/popover";
 import { ProjectPill, projectName } from "../components/ProjectPill";
 import { StatusBadge } from "../components/StatusBadge";
 import type { AppState } from "../lib/appState";
@@ -8,6 +9,7 @@ import { useBootstrap } from "../lib/appState";
 import { fmtShort } from "../lib/dates";
 import { STATUSES } from "../lib/status";
 import type { Objective, Status, Task } from "../lib/types";
+import { Button } from "../components/ui/button";
 
 /* The whole intent tree behind one GitHub-style list header (R1). Only
    Done counts as closed; the title is the click-open affordance; the
@@ -308,10 +310,10 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
       <div className="view-head">
         <h3>Backlog</h3>
         <span className="side">
-          <button type="button" ref={newRef} className="btn btn-primary btn-small picker" onClick={() => setMenu(menu === "new" ? null : "new")}>
+          <Button ref={newRef} className="picker" variant="primary" size="small" onClick={() => setMenu(menu === "new" ? null : "new")}>
             <Icon name="plus" />New
             <svg className="icon" style={{ width: 10, height: 10 }} aria-hidden="true"><use href="#i-caret" /></svg>
-          </button>
+          </Button>
           {menu === "new" && (
             <Popover anchorRef={newRef} align="end" onClose={() => setMenu(null)}><div className="menu">
               <button type="button" className="menu-item" onClick={() => { setMenu(null); onNewTask(); }}>New task</button>
@@ -332,11 +334,14 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
       </div>
       <div className="tree">
         <div className="list-head">
-          <Cbx
+          {/* the list head is a div, so the header select-all can be the
+              real control (ui/checkbox Radix form); row checkboxes stay
+              spans inside their row buttons */}
+          <Checkbox
             checked={allSelected}
             mixed={selectedIds.length > 0 && !allSelected}
             ariaLabel="Select all tasks"
-            onToggle={() => setChecked(toggleAllVisible(checked, visibleRowIds))}
+            onCheckedChange={() => setChecked(toggleAllVisible(checked, visibleRowIds))}
           />
           {bulkMode ? (
             <>
@@ -347,9 +352,9 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
                   say these write, unlike the filter cluster (r1B.3 nit) */}
               <span className="side" aria-busy={bulkBusy}>
                 <span>
-                  <button type="button" ref={bulkStatusRef} className="btn btn-quiet btn-small picker" disabled={bulkBusy} onClick={() => setMenu(menu === "bulk-status" ? null : "bulk-status")}>
+                  <Button ref={bulkStatusRef} className="picker" variant="quiet" size="small" disabled={bulkBusy} onClick={() => setMenu(menu === "bulk-status" ? null : "bulk-status")}>
                     <Icon name="check" />Mark as
-                  </button>
+                  </Button>
                   {menu === "bulk-status" && (
                     <Popover anchorRef={bulkStatusRef} align="end" onClose={() => setMenu(null)}><div className="menu">
                       {STATUSES.map((s) => (
@@ -361,9 +366,9 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
                   )}
                 </span>
                 <span>
-                  <button type="button" ref={bulkProjectRef} className="btn btn-quiet btn-small picker" disabled={bulkBusy} onClick={() => setMenu(menu === "bulk-project" ? null : "bulk-project")}>
+                  <Button ref={bulkProjectRef} className="picker" variant="quiet" size="small" disabled={bulkBusy} onClick={() => setMenu(menu === "bulk-project" ? null : "bulk-project")}>
                     <Icon name="arrow" />Move to
-                  </button>
+                  </Button>
                   {menu === "bulk-project" && (
                     <Popover anchorRef={bulkProjectRef} align="end" onClose={() => setMenu(null)}><div className="menu">
                       {usedProjects.map((p) => (
@@ -378,9 +383,9 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
                   )}
                 </span>
                 <span>
-                  <button type="button" ref={bulkObjectiveRef} className="btn btn-quiet btn-small picker" disabled={bulkBusy} onClick={() => setMenu(menu === "bulk-objective" ? null : "bulk-objective")}>
+                  <Button ref={bulkObjectiveRef} className="picker" variant="quiet" size="small" disabled={bulkBusy} onClick={() => setMenu(menu === "bulk-objective" ? null : "bulk-objective")}>
                     <Icon name="flag" />Set objective
-                  </button>
+                  </Button>
                   {menu === "bulk-objective" && (
                     <Popover anchorRef={bulkObjectiveRef} align="end" onClose={() => setMenu(null)}><div className="menu">
                       {objectiveTree.map(({ l1, l2s }) => (
@@ -400,9 +405,9 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
                   )}
                 </span>
                 <span>
-                  <button type="button" ref={bulkDeleteRef} className="btn btn-quiet btn-small picker" disabled={bulkBusy} onClick={() => setMenu(menu === "bulk-delete" ? null : "bulk-delete")}>
+                  <Button ref={bulkDeleteRef} className="picker" variant="quiet" size="small" disabled={bulkBusy} onClick={() => setMenu(menu === "bulk-delete" ? null : "bulk-delete")}>
                     <Icon name="trash" />Delete
-                  </button>
+                  </Button>
                   {menu === "bulk-delete" && (
                     <Popover anchorRef={bulkDeleteRef} align="end" onClose={() => setMenu(null)}>
                       {selectedObjectiveIds.length === 0 ? (
@@ -422,8 +427,8 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
                           <h4>Delete {plan.summary}?</h4>
                           <p>{plan.consequence}</p>
                           <div className="foot">
-                            <button type="button" className="btn btn-secondary btn-small" onClick={() => setMenu(null)}>Cancel</button>
-                            <button type="button" className="btn btn-primary btn-small" onClick={() => void bulkDelete()}>Delete</button>
+                            <Button variant="secondary" size="small" onClick={() => setMenu(null)}>Cancel</Button>
+                            <Button variant="primary" size="small" onClick={() => void bulkDelete()}>Delete</Button>
                           </div>
                         </div>
                       )}
@@ -440,9 +445,9 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
               </span>
               <span className="side">
                 <span>
-                  <button type="button" ref={statusRef} className="btn btn-quiet btn-small picker" onClick={() => setMenu(menu === "status" ? null : "status")}>
+                  <Button ref={statusRef} className="picker" variant="quiet" size="small" onClick={() => setMenu(menu === "status" ? null : "status")}>
                     <Icon name="status" />Status
-                  </button>
+                  </Button>
                   {menu === "status" && (
                     <Popover anchorRef={statusRef} align="end" onClose={() => setMenu(null)}><div className="menu">
                       {STATUSES.map((s) => (
@@ -462,9 +467,9 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
                   )}
                 </span>
                 <span>
-                  <button type="button" ref={projectRef} className="btn btn-quiet btn-small picker" onClick={() => setMenu(menu === "project" ? null : "project")}>
+                  <Button ref={projectRef} className="picker" variant="quiet" size="small" onClick={() => setMenu(menu === "project" ? null : "project")}>
                     <Icon name="folder" />Project
-                  </button>
+                  </Button>
                   {menu === "project" && (
                     <Popover anchorRef={projectRef} align="end" onClose={() => setMenu(null)}><div className="menu">
                       {usedProjects.map((p) => (
@@ -491,9 +496,9 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
                   )}
                 </span>
                 <span>
-                  <button type="button" ref={sortRef} className="btn btn-quiet btn-small picker" onClick={() => setMenu(menu === "sort" ? null : "sort")}>
+                  <Button ref={sortRef} className="picker" variant="quiet" size="small" onClick={() => setMenu(menu === "sort" ? null : "sort")}>
                     <Icon name="sort" />Sort
-                  </button>
+                  </Button>
                   {menu === "sort" && (
                     <Popover anchorRef={sortRef} align="end" onClose={() => setMenu(null)}><div className="menu">
                       <button type="button" className="menu-item" onClick={() => { setSort("newest"); setMenu(null); }}>
@@ -546,32 +551,5 @@ export function Backlog({ state, onOpenTask, onOpenObjective, onNewTask, onNewOb
   );
 }
 
-function Cbx({ checked, mixed = false, ariaLabel, onToggle }: {
-  checked: boolean;
-  mixed?: boolean; /* header select-all only: some-but-not-all visible tasks */
-  ariaLabel?: string;
-  onToggle: () => void;
-}) {
-  return (
-    <span
-      role="checkbox"
-      aria-checked={mixed ? "mixed" : checked}
-      aria-label={ariaLabel}
-      tabIndex={0}
-      className={checked ? "cbx checked" : mixed ? "cbx mixed" : "cbx"}
-      onClick={(e) => {
-        e.stopPropagation();
-        onToggle();
-      }}
-      onKeyDown={(e) => {
-        if (e.key === " " || e.key === "Enter") {
-          e.preventDefault();
-          e.stopPropagation();
-          onToggle();
-        }
-      }}
-    >
-      {checked ? <Icon name="check" /> : mixed ? <span className="dash" /> : null}
-    </span>
-  );
-}
+/* the row checkbox now lives in ui/checkbox.tsx (RowCheckbox), shared
+   with the Inbox (D31, review R1) */

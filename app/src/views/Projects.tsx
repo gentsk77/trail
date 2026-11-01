@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Icon } from "../components/Icons";
-import { Popover } from "../components/Popover";
+import { Popover } from "../components/ui/popover";
 import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
+import { Button } from "../components/ui/button";
 
 /* Projects, the management surface (D18): a card grid and a New project
    action. A project is first-class — editable name, optional working
@@ -50,16 +51,16 @@ export function Projects({ state, onOpenProject, onNewProject, onOpenConnect }: 
       <div className="view-head">
         <h3>Projects</h3>
         <span className="side">
-          <button type="button" className="btn btn-primary btn-small" onClick={onNewProject}>
+          <Button variant="primary" size="small" onClick={onNewProject}>
             <Icon name="plus" />New project
-          </button>
+          </Button>
         </span>
       </div>
       {projects.length === 0 ? (
         <div className="empty-state">
           <span className="lede">No projects yet</span>
           <span className="why">Connect to agents and Trail imports their projects and sessions.</span>
-          <button type="button" className="btn btn-secondary" onClick={onOpenConnect}>Connect to agents</button>
+          <Button variant="secondary" onClick={onOpenConnect}>Connect to agents</Button>
         </div>
       ) : (
         <div className="proj-grid">
@@ -133,8 +134,8 @@ export function Projects({ state, onOpenProject, onNewProject, onOpenConnect }: 
                   : `Only the project will be deleted. ${countOf(menu.id)} tasks will stay in the backlog, unassigned.`}
             </p>
             <div className="foot">
-              <button type="button" className="btn btn-secondary btn-small" disabled={busy} onClick={() => setMenu(null)}>Cancel</button>
-              <button type="button" className="btn btn-primary btn-small" disabled={busy} onClick={() => void deleteProject(menu.id)}>Delete</button>
+              <Button variant="secondary" size="small" disabled={busy} onClick={() => setMenu(null)}>Cancel</Button>
+              <Button variant="primary" size="small" disabled={busy} onClick={() => void deleteProject(menu.id)}>Delete</Button>
             </div>
           </div>
         </Popover>

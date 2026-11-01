@@ -1,4 +1,5 @@
 import type { ArtifactPreview, Bootstrap, DispatchResult, ProgressResult, TaskDetail, TrailClient } from "../api";
+import { toDay } from "../dates";
 import { destinationFor } from "../destinations";
 import { composeInbox, type InboxResult } from "../inbox";
 import { canSetStatus } from "../status";
@@ -369,8 +370,7 @@ export class DemoClient implements TrailClient {
   }
 
   async runRecon(): Promise<ReconRun> {
-    const day = new Date();
-    const dayStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
+    const dayStr = toDay(new Date());
     const results = this.data.tasks
       .filter((t) => t.date === dayStr && t.status !== "shelved")
       .map((t) => {
@@ -397,10 +397,7 @@ export class DemoClient implements TrailClient {
      task, under its current status, on the task's own day — undated
      tasks fall back to the day the current status landed. */
   async progress(): Promise<ProgressResult> {
-    const localDay = (at: string) => {
-      const d = new Date(at);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    };
+    const localDay = (at: string) => toDay(new Date(at));
     const days: ProgressResult["days"] = {};
     const bucket = (day: string) => (days[day] ??= { done: [], ready: [] });
     for (const task of this.data.tasks) {

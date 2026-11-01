@@ -12,6 +12,8 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
     "types": ["node", "vite/client"]
   },
   "include": ["src", "server", "test", "scripts", "vite.config.ts"]

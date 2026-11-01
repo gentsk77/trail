@@ -3,10 +3,11 @@ import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
 import { fmtShort } from "../lib/dates";
 import { Icon } from "./Icons";
-import { ModalWrap } from "./Modal";
-import { Popover } from "./Popover";
+import { ModalWrap } from "./ui/dialog";
+import { Popover } from "./ui/popover";
 import { ProjectPill, projectName } from "./ProjectPill";
 import { StatusBadge } from "./StatusBadge";
+import { Button } from "./ui/button";
 
 /* Objective detail on the task modal's exact anatomy (dogfood r3):
    editable title in the header, description then Tasks in the main
@@ -126,7 +127,7 @@ export function ObjectiveModal({ state, objectiveId, onClose, onOpenTask, onOpen
     : [done > 0 ? `${done} done` : null, open > 0 ? `${open} open` : null].filter(Boolean).join(" · ");
 
   return (
-    <ModalWrap onClose={onClose}>
+    <ModalWrap label={isCreate ? "New objective" : "Objective detail"} onClose={onClose}>
       {/* one height either mode (dogfood r4.1): the blank create panel
           stands as tall as a typical view, so the swap never shrinks it */}
       <div className="dm" style={{ minHeight: "26rem" }}>
@@ -163,9 +164,9 @@ export function ObjectiveModal({ state, objectiveId, onClose, onOpenTask, onOpen
                 {shown.title || <span style={{ color: "var(--gray-700)" }}>Objective title</span>}
               </button>
             )}
-            <button type="button" className="btn btn-quiet btn-icon dm-close" aria-label="Close" onClick={onClose}>
+            <Button className="dm-close" variant="quiet" size="icon" aria-label="Close" onClick={onClose}>
               <Icon name="x" />
-            </button>
+            </Button>
           </h4>
           {!isCreate && <span className="dm-sub">{rollup}</span>}
         </div>
@@ -269,13 +270,13 @@ export function ObjectiveModal({ state, objectiveId, onClose, onOpenTask, onOpen
         <div className="dm-foot">
           {isCreate ? (
             <>
-              <button type="button" className="btn btn-quiet" onClick={onClose}>Cancel</button>
-              <button type="button" className="btn btn-primary" disabled={busy || !pendingTitle} onClick={() => void create()}>Create</button>
+              <Button variant="quiet" onClick={onClose}>Cancel</Button>
+              <Button variant="primary" disabled={busy || !pendingTitle} onClick={() => void create()}>Create</Button>
             </>
           ) : (
             <>
-              <button type="button" className="btn btn-quiet" onClick={onClose}>Close</button>
-              <button type="button" className="btn btn-primary" disabled={busy || !dirty} onClick={() => void save()}>Save</button>
+              <Button variant="quiet" onClick={onClose}>Close</Button>
+              <Button variant="primary" disabled={busy || !dirty} onClick={() => void save()}>Save</Button>
             </>
           )}
         </div>

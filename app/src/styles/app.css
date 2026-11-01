@@ -59,7 +59,9 @@
 .btn.btn-primary .icon { color: var(--brand-ink); }
 
 /* ============ task card ============ */
-.task-card { width: 17rem; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-raised); padding: var(--space-3) var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); cursor: pointer; transition: border-color var(--duration-state) var(--ease); }
+/* no base width: the card fills its column (the sheet's law); the 17rem
+   base had no sheet basis and only the .col override masked it (review V7) */
+.task-card { background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-raised); padding: var(--space-3) var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); cursor: pointer; transition: border-color var(--duration-state) var(--ease); }
 .task-card:hover { border-color: var(--gray-500); }
 .task-card .title { font: var(--type-body); line-height: 1.4; color: var(--gray-1000); }
 .task-card .meta { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
@@ -112,20 +114,19 @@
 .sidebar.collapsed .nav-item { justify-content: center; position: relative; }
 .sidebar.collapsed .nav-dot { position: absolute; top: var(--space-1); right: var(--space-1); margin: 0; }
 .sidebar.collapsed .demo-banner { justify-content: center; }
-/* hover tips, rail only: micro-popovers on the menu chrome; a beat of
-   delay in, gone at once on leave */
-.sidebar.collapsed [data-tip]::after {
-  content: attr(data-tip); position: absolute; left: calc(100% + var(--space-2)); top: 50%; transform: translateY(-50%);
-  z-index: 30; white-space: nowrap; font: var(--type-caption); color: var(--gray-1000);
+/* hover tips, rail only (ui/tooltip.tsx on Radix): micro-popovers on the
+   menu chrome — caption type, background-2, gray-300 border, float
+   shadow; the 200ms beat in is the primitive's delay, gone at once on
+   leave (no exit animation). Portaling retires the old z literal. */
+.tip {
+  white-space: nowrap; font: var(--type-caption); color: var(--gray-1000);
   background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-s);
   padding: var(--space-1) var(--space-2); box-shadow: var(--shadow-float);
-  opacity: 0; pointer-events: none; transition: opacity var(--duration-state) var(--ease);
+  animation: reveal-in var(--duration-state) var(--ease);
 }
-.sidebar.collapsed [data-tip]:hover::after { opacity: 1; transition-delay: 200ms; }
-.sidebar.collapsed .demo-banner[data-tip], .sidebar.collapsed .nav-toggle[data-tip] { position: relative; }
 /* the resize handle: a 6px grab strip straddling the border; the
    hairline lights on hover and while dragging; double-click resets */
-.sidebar-rsz { position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; z-index: 20; touch-action: none; }
+.sidebar-rsz { position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; touch-action: none; }
 .sidebar-rsz::after { content: ""; position: absolute; top: 0; bottom: 0; left: 2px; width: 2px; background: transparent; transition: background-color var(--duration-state) var(--ease); }
 .sidebar-rsz:hover::after, .sidebar.dragging .sidebar-rsz::after { background: var(--gray-500); }
 .nav-item { display: flex; align-items: center; gap: var(--space-2); width: 100%; text-align: left; font: var(--type-body); color: var(--gray-900); background: transparent; border: 0; border-radius: var(--radius-s); padding: var(--space-2) var(--space-3); cursor: pointer; transition: background-color var(--duration-state) var(--ease); }
@@ -166,8 +167,13 @@
    on white / light-gray on charcoal — visible without hitting either
    pole. The demo-notice amber stays the banner's; the toast carries
    contrast, not hue. */
-.demo-toast { position: fixed; bottom: var(--space-6); left: 50%; transform: translateX(-50%); z-index: 50; max-width: min(28rem, calc(100vw - 2rem)); display: flex; align-items: flex-start; gap: var(--space-2); background: var(--gray-900); border: 0; border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-2) var(--space-4); font: var(--type-body); color: var(--background-2); }
+.demo-toast { max-width: min(28rem, calc(100vw - 2rem)); width: max-content; display: flex; align-items: flex-start; gap: var(--space-2); background: var(--gray-900); border: 0; border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-2) var(--space-4); font: var(--type-body); color: var(--background-2); }
 .demo-toast .icon { width: 14px; height: 14px; flex: none; margin-top: 3px; }
+/* Sonner owns positioning; its entrance/exit transforms are killed —
+   the ruled toast appears and leaves plainly (motion = liveness only),
+   and !important is the only seat above Sonner's injected stylesheet */
+[data-sonner-toast] { transition: none !important; animation: none !important; transform: none !important; }
+[data-sonner-toaster] { font: var(--type-body); }
 /* views render into one centered column capped at the sheet's wide demo
    frame (78rem); on ultrawide viewports the surplus becomes symmetric
    gutters instead of stretching the board */
@@ -183,7 +189,8 @@
 .seg { display: inline-flex; align-items: center; background: var(--gray-200); border-radius: var(--radius-full); padding: 2px; }
 .seg .btn-small { color: var(--gray-900); height: 1.625rem; border-radius: var(--radius-full); }
 .seg .btn-small:hover { background: transparent; color: var(--gray-1000); }
-.seg .btn-small.active { background: var(--background-2); color: var(--gray-1000); }
+/* the active thumb keys off Radix data-state (ui/toggle-group) */
+.seg .btn-small[data-state="on"] { background: var(--background-2); color: var(--gray-1000); }
 .jump { width: 5rem; padding: 0; text-align: center; }
 .btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.875rem; height: 1.875rem; padding: 0; }
 .picker { display: inline-flex; align-items: center; gap: var(--space-2); }
@@ -192,22 +199,26 @@
 .picker.fixed .lbl { flex: 1; text-align: center; }
 
 /* 15rem: fits "September 2026" + nav with room, ~28px day cells; 17rem
-   read as dead space in week mode (dogfood r1B item 11) */
-.cal { width: 15rem; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-4); }
-.cal-head { display: flex; align-items: center; margin-bottom: var(--space-2); }
-.cal-head .month { font: var(--type-label); color: var(--gray-1000); }
-.cal-head .nav { margin-left: auto; display: flex; gap: var(--space-1); }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-grid .dow { font: var(--type-caption); color: var(--gray-700); text-align: center; padding: var(--space-1) 0; }
-.cal-grid .day { font: var(--type-caption); color: var(--gray-1000); text-align: center; padding: var(--space-1) 0; border-radius: var(--radius-s); cursor: pointer; border: 1px solid transparent; background: transparent; }
-.cal-grid .day:hover { background: var(--gray-100); }
-.cal-grid .day.muted { color: var(--gray-600); }
-.cal-grid .day.today { border-color: var(--gray-500); }
-.cal-grid .day.selected { background: var(--brand); color: var(--brand-ink); }
-.cal-grid .day.in-week { background: var(--brand-soft); color: var(--brand-text); border-radius: 0; }
-.cal-grid .day.in-week.first { border-radius: var(--radius-s) 0 0 var(--radius-s); }
-.cal-grid .day.in-week.last { border-radius: 0 var(--radius-s) var(--radius-s) 0; }
-.cal-grid .day.in-week.selected { background: var(--brand); color: var(--brand-ink); border-radius: var(--radius-s); }
+   read as dead space in week mode (dogfood r1B item 11). The grid is the
+   shadcn calendar (react-day-picker, ui/calendar.tsx — D31); these rules
+   style its table to the ruled grammar. */
+.cal { position: relative; width: 15rem; background: var(--background-2); border: 1px solid var(--gray-300); border-radius: var(--radius-m); box-shadow: var(--shadow-float); padding: var(--space-4); }
+.cal .cal-caption { display: flex; align-items: center; min-height: 1.875rem; margin-bottom: var(--space-1); }
+.cal .month { font: var(--type-label); color: var(--gray-1000); }
+.cal .cal-nav { position: absolute; top: var(--space-4); right: var(--space-4); display: flex; gap: var(--space-1); }
+.cal .cal-table { width: 100%; border-collapse: separate; border-spacing: 2px; }
+.cal .dow { font: var(--type-caption); font-weight: 400; color: var(--gray-700); text-align: center; padding: var(--space-1) 0; }
+.cal .cal-day { padding: 0; text-align: center; }
+.cal .day { width: 100%; font: var(--type-caption); color: var(--gray-1000); text-align: center; padding: var(--space-1) 0; border-radius: var(--radius-s); cursor: pointer; border: 1px solid transparent; background: transparent; }
+.cal .day:hover { background: var(--gray-100); }
+.cal .cal-day.muted .day { color: var(--gray-600); }
+.cal .cal-today .day { border-color: var(--gray-500); }
+.cal .cal-day.selected .day { background: var(--brand); color: var(--brand-ink); }
+.cal .cal-day.in-week { background: var(--brand-soft); }
+.cal .cal-day.in-week .day { color: var(--brand-text); border-radius: 0; }
+.cal .cal-day.in-week.first { border-radius: var(--radius-s) 0 0 var(--radius-s); }
+.cal .cal-day.in-week.last { border-radius: 0 var(--radius-s) var(--radius-s) 0; }
+.cal .cal-day.anchor .day { background: var(--brand); color: var(--brand-ink); border-radius: var(--radius-s); }
 .cal-foot { border-top: 1px solid var(--gray-200); margin-top: var(--space-2); padding-top: var(--space-2); font: var(--type-caption); color: var(--gray-800); text-align: center; }
 
 /* ============ board ============ */
@@ -259,11 +270,15 @@
 /* None sits apart from the real options (r1B.3 nit) */
 .menu-item.sep-above { border-top: 1px solid var(--gray-200); margin-top: var(--space-1); border-top-left-radius: 0; border-top-right-radius: 0; }
 .menu-label { font: var(--type-caption); color: var(--gray-800); padding: var(--space-2) var(--space-3) var(--space-1); }
-/* the popover primitive's panel (Popover.tsx owns placement): fixed +
-   portaled so opening one never reflows or scrolls an ancestor; sits
-   above the modal layer (dm-wrap z 40); overlong content scrolls inside */
-.popover { position: fixed; z-index: 50; display: flex; flex-direction: column; }
+/* the popover primitive's panel (ui/popover.tsx, Radix-positioned):
+   portaled so opening one never reflows or scrolls an ancestor; portal
+   order layers it above the modal layer — no z literal (D31, closing the
+   z-scale question); height caps at the ruled min(20rem, available) via
+   the Radix measurement; overlong content scrolls inside. The 200ms
+   reveal is the ruled entrance (C2, re-timed to tokens). */
+.popover { display: flex; flex-direction: column; max-height: min(20rem, var(--radix-popover-content-available-height, 20rem)); animation: reveal-in var(--duration-reveal) var(--ease); }
 .popover > * { min-height: 0; overflow-y: auto; }
+@keyframes reveal-in { from { opacity: 0; transform: translateY(-2px); } }
 
 /* ============ selection checkbox ============ */
 .cbx { width: 1rem; height: 1rem; flex: none; border: 1px solid var(--gray-700); border-radius: var(--radius-full); background: var(--background-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
@@ -354,7 +369,6 @@
 /* whole header = the disclosure target (r4/r5, ARIA disclosure pattern);
    interactive children except themselves */
 .ib-head { display: flex; align-items: center; gap: var(--space-2); min-width: 0; cursor: pointer; }
-.ib-head .cbx:not(.checked) .icon { visibility: hidden; }
 .ib-head .title { font: var(--type-body); color: var(--gray-1000); text-align: left; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ib-head .arts { font: var(--type-data); color: var(--gray-700); white-space: nowrap; }
 .ib-open { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-1); background: transparent; border: 0; padding: 0; font: var(--type-caption); color: var(--gray-800); cursor: pointer; white-space: nowrap; transition: color var(--duration-state) var(--ease); }
@@ -388,6 +402,9 @@
 /* real renders (D17): image covers the frame; html is an inert
    sandboxed page scaled to fit; text shows its opening lines */
 .thumb .prev img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* the preview canvas is deliberately white in both themes (ruled at the
+   D31 review): an html render reads as paper, not as a themed surface —
+   the one sanctioned non-token color outside the vendor marks */
 .thumb .prev iframe { position: absolute; top: 0; left: 0; width: 400%; height: 400%; transform: scale(0.25); transform-origin: 0 0; border: 0; background: #fff; pointer-events: none; }
 .thumb .prev .txt { align-self: stretch; flex: 1; padding: var(--space-2) var(--space-3); font: var(--type-data); font-size: 0.5rem; line-height: 1.6; color: var(--gray-800); white-space: pre-wrap; overflow: hidden; text-align: left; }
 .thumb .foot { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); font: var(--type-data); color: var(--gray-900); min-width: 0; }
@@ -465,8 +482,13 @@
 /* the wrapper dims the page behind the panel (--scrim; dogfood r3,
    superseding the no-scrim ruling) and stays the click-catcher — outside
    click closes. Placement is dead center, both axes (dogfood r2); the
-   panel caps at the padded viewport and keeps its float shadow. */
-.dm-wrap { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; padding: var(--space-10) var(--space-6); background: var(--scrim); }
+   panel caps at the padded viewport and keeps its float shadow. Radix
+   portal order carries the layering — no z literal (D31) — and the
+   entrance rides the ruled overlay duration (C2). */
+.dm-wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: var(--space-10) var(--space-6); background: var(--scrim); animation: overlay-in var(--duration-overlay) var(--ease); }
+.dm-wrap > .dm { animation: panel-in var(--duration-overlay) var(--ease); }
+@keyframes overlay-in { from { background: transparent; } }
+@keyframes panel-in { from { opacity: 0; transform: scale(0.98); } }
 /* title-row action (dogfood r3): Dispatch rides the header grammar,
    pinned to the row's end */
 .dm-title .dm-act-btn { margin-left: auto; flex: none; }
@@ -557,7 +579,7 @@ textarea.input { resize: vertical; min-height: 5.5rem; line-height: 1.6; }
    Vendor tile colors are identity, not meaning-hues. */
 .app-tile { width: 20px; height: 20px; flex: none; border-radius: var(--radius-s); display: inline-flex; align-items: center; justify-content: center; }
 .app-tile .icon { width: 12px; height: 12px; }
-.app-tile.claude { background: var(--brand-claude); color: #fff; }
+.app-tile.claude { background: var(--brand-claude); color: var(--brand-ink); }
 /* the official Codex mark is its own tile (dogfood r4): no added border or
    fill — the mark's white plate + gradient glyph render full-size, corners
    clipped to the shared tile radius so it sits square with the Claude tile */

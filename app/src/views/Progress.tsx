@@ -4,6 +4,7 @@ import { StatusBadge } from "../components/StatusBadge";
 import type { AppState } from "../lib/appState";
 import { useBootstrap } from "../lib/appState";
 import { addDays, fmtDayLong, fmtShort, today, weekStart } from "../lib/dates";
+import { Skeleton } from "../components/ui/skeleton";
 
 /* Progress (D12, revised r1B): the activity grid is the long arc — twenty-
    six weeks, five shades, cell depth = the day's ready + done on one
@@ -104,7 +105,8 @@ export function Progress({ state, onOpenTask }: { state: AppState; onOpenTask: (
               if (day > td) {
                 return <button key={day} type="button" className="heat-cell future" tabIndex={-1} aria-hidden="true" />;
               }
-              const label = `${fmtShort(day)} — ${daySummary(p?.done.length ?? 0, p?.ready.length ?? 0)}`;
+              /* colon join: the em dash stays a docs-register mark (voice law) */
+              const label = `${fmtShort(day)}: ${daySummary(p?.done.length ?? 0, p?.ready.length ?? 0)}`;
               const cls = ["heat-cell", heatClass(count), day === selected ? "selected" : ""].filter(Boolean).join(" ");
               return (
                 <button
@@ -133,7 +135,7 @@ export function Progress({ state, onOpenTask }: { state: AppState; onOpenTask: (
         <span className="lbl">{fmtDayLong(selected)}</span>
         <span className="count">
           {loading
-            ? <span className="skel skel-text" style={{ width: "7rem" }} />
+            ? <Skeleton text style={{ width: "7rem" }} />
             : daySummary(doneTasks.length, readyTasks.length)}
         </span>
       </div>

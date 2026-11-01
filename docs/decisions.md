@@ -38,6 +38,7 @@ Code comments cite these rulings by number (D8, D24.1, …); F- and R-numbers re
 | D28 | Projects can be deleted (card overflow menu; confirm on the mini-dialog chrome naming the consequence): tasks unassign rather than die; a connected project's store dir returns to the exclusion list |
 | D29 | UI r3 batch: column heads reserve the action slot (board alignment), the filter undo rehomes inside each menu as a scoped Clear and select-all retires from filters, objectives can be deleted via bulk delete (children promote, tasks unassign) |
 | D30 | Imports are content-aware and skip stillborn sessions: the connect import runs the D24 content pass (claim + no question lands Ready at birth), and zero-assistant-turn transcripts never reach the picker or the import |
+| D31 | Full design review + shadcn/ui migration: the primitive layer moves to shadcn (agency-setup's vetted default), sheet stays sovereign; focus trap ships, entrances join the motion set, z-scale closes on portal order; review-fix batch (voice, truncation, dates home, sidecar gate) |
 
 ## Entries
 
@@ -89,6 +90,8 @@ Five surfaces, each serving one lens: **Backlog** (objective → task tree; obje
 
 *Amended by D22 (icon grammar moves from the custom stroke set to Material Symbols Outlined; Roboto Serif joins the ruled faces for the wordmark alone).*
 
+*Amended by D31 (overlay and reveal entrances join the ruled motion set on the duration tokens; motion-as-liveness otherwise stands).*
+
 *Extended at the 2026-07-15 mock rounds: heat-ramp tokens `--heat-1..4` authorized (D12's grid; five shades with the empty gray); new library icons (nav set, calendar, chevrons, plus, check, close, pencil, open-link, arrow); type/state item icons parked.*
 
 *Amended by D19 (vendor brand-mark tile colors are identity, exempt from meaning-hue rationing; the focus treatment becomes the border-lit rule).*
@@ -112,6 +115,8 @@ The Progress view (Recap's ruled name; the full nav set renamed Dashboard / Back
 ### D13 — Prototype stack and gates (2026-07-15)
 
 *Amended by D14 (the operator-picked import call is superseded by the settings connect flow).*
+
+*Amended by D31 (the stack gains Tailwind and the shadcn/ui primitive layer; the gates stand).*
 
 Vite + React + TypeScript SPA; Node (Fastify) sidecar owning the local adapters, harvester, dispatch, and live updates (SSE); JSON file store under `app/data/` (tasks/objectives/sessions/recon/settings documents plus append-only `evidence.jsonl` and `activity.jsonl`; gitignored). Gates ruled with the stack: `tsc --noEmit` + `npm test` (Vitest), applied per commit, never crossed red. Demo mode (D2) ships as a static Vite build with the seeded adapter compiled in — the sidecar never deploys, so the live substrate never leaves the machine (F5); Vercel deploy is maintainer-run. Resolves the stack ⚖ deferred by D4. Maintainer ruled 2026-07-15 at build kickoff, alongside three implementation calls within D5's frame: harvester language pass via headless `claude -p` (degrades to heuristic-only), dispatch via a Windows Terminal-spawned interactive session carrying the task-id marker, and import as operator-picked directories (no auto-import).
 
@@ -168,6 +173,8 @@ Same session. The Projects view drops its session lists and becomes project mana
 ### D19 — Dogfood round 2: maintainer UI ruling batch (2026-07-15)
 
 *Amended by D22 (the Codex placeholder hexagon is replaced by the official Codex mark, LobeHub colored variant, on a white app tile).*
+
+*Amended by D31 (item 2's focus-trap deferral retires: the Radix dialog ships the trap and restore; the 1px border-lit focus rule of item 1 was revisited and reaffirmed).*
 
 Maintainer feedback from testing `feat/inbox-projects`, ratified as one batch. Amends D10, D14, D17, D18 (stamped above).
 
@@ -273,3 +280,19 @@ Maintainer requested 2026-07-16 (ui r3); the three forks (clear scope, delete su
 ### D30 — Imports are content-aware; stillborn sessions never import (2026-07-16)
 
 The maintainer's live import of real session history surfaced two gaps, fixed on the import-status-dedup lane. (1) The connect import birthed task status from the clock-only statusForSession and never ran applyLiveStatus, so a session whose closing turn claims an outcome and asks nothing landed Waiting — its artifact invisible to the Inbox sign-off queue until the 30-minute close swept it. Ruling: the import loop runs the content pass after ensureTaskForSession; D24's "content decides between the two waits" applies at birth, not only on the watch path. (2) A queued prompt re-dispatched into a fresh session file leaves a stillborn transcript — the prompt, zero assistant turns — and importing it minted a phantom duplicate task. Ruling: SessionSummary carries hasAssistantTurns; the connect picker and the import skip sessions without one. Title/prompt dedup was considered and rejected: intentional reruns share prompts (the demo seeding does exactly this). The live watch path is deliberately untouched — a just-started session appearing Running before its first reply is the product working. Maintainer requested the fix 2026-07-16, same session the bugs were diagnosed.
+
+### D31 — Full design review; the primitive layer moves to shadcn/ui (2026-07-20)
+
+The maintainer asked for a full design review of Trail against agency-setup's standards and ruled the stack question it surfaced: Trail hand-rolled every UI primitive while the agency library's sources registry names shadcn/ui the recommended base ("components-by-default is the standing posture"). Ruling: **full shadcn migration** — the primitive layer is shadcn/ui components (Radix underneath), the sheet stays sovereign, and where a library default disagrees with a ruled law the component is restyled, never the law relaxed. Amends D13 (stack: Tailwind + shadcn join; the tsc + vitest gates stand, applied per phase).
+
+Sub-rulings taken with it, each put to the maintainer:
+
+1. **beUI skipped.** The vetted motion layer stays out while the Motion law rations motion to liveness (sources.md's own "only when the project rules motion in").
+2. **lucide rejected.** shadcn components ship lucide glyphs; every one is replaced by the Material Symbols library (D22 stands). Vendor marks unaffected.
+3. **Entrances admitted** (maintainer pick over the strip-entrances recommendation): menus and popovers reveal on `--duration-reveal`, modals enter on `--duration-overlay`, both on the one easing; the demo toast still appears plainly (its law outranks this). Amends D10's letter.
+4. **Focus trap ships.** The Radix dialog carries the trap and restore D19.2 deferred; the 1px border-lit focus rule was revisited and **reaffirmed** over shadcn's ring (D19.1 stands). Amends D19.
+5. **Z-scale closed.** Radix portal order replaces the 40/50 literals; no z-index literal ships in app code. The standing open question retires.
+6. **One-primitive law kept over shadcn's menu taxonomy**: every float panel rides the one popover component; DropdownMenu never ships. Outside click keeps leaving focus where the user clicked (reaffirmed); Radix collision logic replaces the letter of the flip rule.
+7. **Checkbox forms follow HTML**: the Radix control where the box is its own element, a span form inside row buttons (nested buttons are invalid), a display-only mark where the row carries the action — one home, three renderings (the review's three hand-rolled variants collapse).
+
+The review's fix batch rode the same lane: the heat-cell tooltip's em dash died (voice law), the task-modal objective menu gained the 28ch cap + hover title, the task card lost its un-ruled 17rem base width, the html-preview canvas's white was ruled deliberate (a document render reads as paper, both themes), local-date formatting single-homed into `src/lib/dates`, and the sidecar pinned CORS to local origins and gated `POST /api/open` on the evidence log before any spawn (route-tested). Findings the review cleared without change are on record in the session log. Maintainer approved the plan and the contested picks 2026-07-20.
